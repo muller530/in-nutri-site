@@ -17,7 +17,7 @@ async function getProducts() {
 interface DbProduct {
   name: string;
   category?: string;
-  priceCents: number;
+  priceCents: number | null;
   shortDescription?: string;
   mainImage?: string;
   tags?: string;
@@ -28,10 +28,13 @@ interface DbProduct {
 
 function transformProduct(dbProduct: DbProduct): Product {
   const tags = dbProduct.tags ? (typeof dbProduct.tags === "string" ? JSON.parse(dbProduct.tags) : dbProduct.tags) : [];
+  const price = dbProduct.priceCents != null 
+    ? `¥${(dbProduct.priceCents / 100).toFixed(0)} / ${dbProduct.shortDescription || ""}`
+    : `${dbProduct.shortDescription || ""}`;
   return {
     name: dbProduct.name,
     flavor: dbProduct.category || "",
-    price: `¥${(dbProduct.priceCents / 100).toFixed(0)} / ${dbProduct.shortDescription || ""}`,
+    price: price,
     image: dbProduct.mainImage || "https://images.unsplash.com/photo-1502740479091-635887520276?auto=format&fit=crop&w=900&q=80",
     description: dbProduct.shortDescription || "",
     tags: tags,

@@ -73,7 +73,7 @@ export async function PUT(request: NextRequest) {
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ data: null, error: error.errors }, { status: 400 });
+      return NextResponse.json({ data: null, error: error.issues }, { status: 400 });
     }
     if (error instanceof Response) return error;
     console.error("Error updating brand story:", error);

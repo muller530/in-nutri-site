@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data: newProduct[0], error: null }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ data: null, error: error.errors }, { status: 400 });
+      return NextResponse.json({ data: null, error: error.issues }, { status: 400 });
     }
     if (error instanceof Response) return error;
     console.error("Error creating product:", error);

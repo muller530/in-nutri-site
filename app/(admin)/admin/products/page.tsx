@@ -39,7 +39,9 @@ export default async function AdminProductsPage() {
                 <td className="px-6 py-4 text-sm text-gray-900">{product.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{product.slug}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {product.priceCents != null ? `¥${(product.priceCents / 100).toFixed(2)}` : "-"}
+                  {product.priceCents !== null && product.priceCents !== undefined 
+                    ? `¥${(product.priceCents / 100).toFixed(2)}` 
+                    : "-"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">
                   {product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : "-"}

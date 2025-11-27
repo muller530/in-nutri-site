@@ -50,7 +50,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             name: data.data.name || "",
             shortDescription: data.data.shortDescription || "",
             longDescription: data.data.longDescription || "",
-            priceYuan: data.data.priceCents ? (data.data.priceCents / 100).toFixed(2) : "",
+            priceYuan: data.data.priceCents != null ? (data.data.priceCents / 100).toFixed(2) : "",
             mainImage: data.data.mainImage || "",
             gallery: data.data.gallery || "[]",
             tags: tagsString,

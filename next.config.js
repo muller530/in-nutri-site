@@ -9,7 +9,10 @@ const nextConfig = {
     ],
   },
   // Cloudflare Pages 适配
-  // 注意：Cloudflare Pages 使用 Edge Runtime，某些 Node.js API 可能不可用
+  // Next.js 16 在 Cloudflare Pages 上需要输出为 standalone
+  output: 'standalone',
+  // 禁用静态优化，因为我们需要服务器端渲染
+  // 但 Cloudflare Pages 支持 Edge Runtime
   experimental: {
     // 如果需要使用 Edge Runtime，可以启用
     // runtime: 'edge',

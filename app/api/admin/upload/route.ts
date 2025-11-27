@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { requireAdmin } from "@/lib/auth";
 
-// 注意：此路由不使用 Edge Runtime，因为需要使用文件系统
-// export const runtime = 'edge'; // 已移除，使用 Node.js runtime
+// 注意：此路由必须使用 Node.js Runtime，因为需要使用文件系统
+export const runtime = 'nodejs';
 import { writeFile, mkdir } from "fs/promises";
 
 import { join } from "path";

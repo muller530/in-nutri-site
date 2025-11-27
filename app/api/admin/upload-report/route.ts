@@ -12,7 +12,6 @@ import { requireAdmin } from "@/lib/auth";
 
 import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
 
-export const runtime = 'edge';
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin(request); // 确保只有管理员可以上传

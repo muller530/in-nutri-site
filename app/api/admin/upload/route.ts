@@ -14,7 +14,6 @@ import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
 
 import { v4 as uuidv4 } from "uuid";
 
-export const runtime = 'edge';
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin(request);

@@ -7,6 +7,8 @@ import { ScienceHighlights } from "@/components/ScienceHighlights";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SiteFooter } from "@/components/SiteFooter";
 
+export const runtime = 'edge';
+
 const services = [
   {
     title: "1v1 功能营养师",

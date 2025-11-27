@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { recipes } from "@/db/schema";
+
 import { eq } from "drizzle-orm";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { z } from "zod";
 
+export const runtime = 'edge';
 const updateRecipeSchema = z.object({
   slug: z.string().min(1).optional(),
   name: z.string().min(1).optional(),

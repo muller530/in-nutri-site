@@ -1,4 +1,5 @@
 import Link from "next/link";
+export const runtime = 'edge';
 import { db } from "@/db";
 import { members } from "@/db/schema";
 

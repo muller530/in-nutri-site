@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { recipes } from "@/db/schema";
+
 import { eq } from "drizzle-orm";
 
+export const runtime = 'edge';
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;

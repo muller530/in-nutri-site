@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { siteSettings } from "@/db/schema";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { z } from "zod";
+
 import { eq } from "drizzle-orm";
 
+export const runtime = 'edge';
 const updateSiteSettingsSchema = z.object({
   douyinUrl: z.string().url().optional().or(z.literal("")),
   xiaohongshuUrl: z.string().url().optional().or(z.literal("")),

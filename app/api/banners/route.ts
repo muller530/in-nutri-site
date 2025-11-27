@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { banners } from "@/db/schema";
+
 import { eq, asc } from "drizzle-orm";
 
+export const runtime = 'edge';
 export async function GET() {
   try {
     const allBanners = await db

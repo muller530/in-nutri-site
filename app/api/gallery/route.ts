@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { galleryImages } from "@/db/schema";
+
 import { asc } from "drizzle-orm";
 
+export const runtime = 'edge';
 export async function GET() {
   try {
     const allImages = await db.select().from(galleryImages).orderBy(asc(galleryImages.sortOrder));

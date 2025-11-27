@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { members } from "@/db/schema";
+
 import { eq } from "drizzle-orm";
+
 import bcrypt from "bcryptjs";
+
 import { createSession, getSessionCookieName } from "@/lib/auth";
+
 import { cookies } from "next/headers";
+
 import { z } from "zod";
 
+export const runtime = 'edge';
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),

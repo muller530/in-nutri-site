@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { requireAdmin } from "@/lib/auth";
+
+// 注意：此路由不使用 Edge Runtime，因为需要使用文件系统
+// export const runtime = 'edge'; // 已移除，使用 Node.js runtime
 import { writeFile, mkdir } from "fs/promises";
+
 import { join } from "path";
+
 import { existsSync } from "fs";
+
 import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
+
 import { v4 as uuidv4 } from "uuid";
 
+export const runtime = 'edge';
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin(request);

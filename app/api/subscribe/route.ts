@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { subscribers, type NewSubscriber } from "@/db/schema";
 
+export const runtime = 'edge';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

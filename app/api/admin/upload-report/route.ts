@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { writeFile, mkdir } from "fs/promises";
+
 import path from "path";
+
 import { v4 as uuidv4 } from "uuid";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
 
+export const runtime = 'edge';
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin(request); // 确保只有管理员可以上传

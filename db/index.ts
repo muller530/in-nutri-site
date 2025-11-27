@@ -13,10 +13,16 @@ function getDbInstance(): DbType {
   }
 
   // 检测运行环境
-  // 关键：构建时（Next.js build）永远不使用 D1，即使检测到环境变量
-  // 只有在实际运行时（请求处理时）才检测 D1 绑定
-  // 通过检查是否有实际的 D1 绑定对象来判断，而不是环境变量
-  const hasD1Binding = typeof (globalThis as any).DB !== "undefined" && (globalThis as any).DB !== null;
+  // 关键：构建时（Next.js build）永远不使用 D1
+  // 通过检查是否在构建阶段来判断
+  const isBuildTime = typeof process !== "undefined" && 
+                       (process.env.NEXT_PHASE === "phase-production-build" ||
+                        (process.env.NODE_ENV === "production" && !process.env.CF_PAGES_BRANCH));
+  
+  // 只有在非构建阶段且有实际 D1 绑定时才使用 D1
+  const hasD1Binding = !isBuildTime && 
+                       typeof (globalThis as any).DB !== "undefined" && 
+                       (globalThis as any).DB !== null;
   
   // 只有在有实际 D1 绑定时才使用 D1（这意味着在运行时）
   if (hasD1Binding) {

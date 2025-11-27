@@ -1,4 +1,5 @@
 import { db } from "@/db";
+export const runtime = 'edge';
 import { brandStory } from "@/db/schema";
 import Link from "next/link";
 

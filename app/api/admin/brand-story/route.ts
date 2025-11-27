@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { brandStory } from "@/db/schema";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { z } from "zod";
 
+export const runtime = 'edge';
 const updateBrandStorySchema = z.object({
   heroTitle: z.string().optional(),
   heroSubtitle: z.string().optional(),

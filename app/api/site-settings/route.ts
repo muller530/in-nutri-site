@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { siteSettings } from "@/db/schema";
 
+export const runtime = 'edge';
 // GET: 获取站点设置（公开）
 export async function GET() {
   try {

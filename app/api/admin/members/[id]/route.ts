@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { members } from "@/db/schema";
+
 import { eq } from "drizzle-orm";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { z } from "zod";
+
 import bcrypt from "bcryptjs";
 
+export const runtime = 'edge';
 const updateMemberSchema = z.object({
   email: z.string().email().optional(),
   name: z.string().optional(),

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { contactMessages, type NewContactMessage } from "@/db/schema";
+
 import { desc } from "drizzle-orm";
 
+export const runtime = 'edge';
 export async function GET() {
   try {
     const allMessages = await db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { brandStory } from "@/db/schema";
 
+export const runtime = 'edge';
 export async function GET() {
   try {
     const story = await db.select().from(brandStory).limit(1);

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { recipes } from "@/db/schema";
 
+export const runtime = 'edge';
 export async function GET() {
   try {
     const allRecipes = await db.select().from(recipes);

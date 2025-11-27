@@ -1,4 +1,5 @@
 import Link from "next/link";
+export const runtime = 'edge';
 import { db } from "@/db";
 import { banners } from "@/db/schema";
 

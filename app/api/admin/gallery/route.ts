@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { galleryImages } from "@/db/schema";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { z } from "zod";
 
+export const runtime = 'edge';
 const createGalleryImageSchema = z.object({
   title: z.string().optional(),
   alt: z.string().optional(),

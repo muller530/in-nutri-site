@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { members } from "@/db/schema";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { z } from "zod";
+
 import bcrypt from "bcryptjs";
 
+export const runtime = 'edge';
 const createMemberSchema = z.object({
   email: z.string().email(),
   name: z.string().optional(),

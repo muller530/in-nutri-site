@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/db";
+
 import { recipes } from "@/db/schema";
+
 import { requireAdmin } from "@/lib/auth";
+
 import { z } from "zod";
 
+export const runtime = 'edge';
 const createRecipeSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),

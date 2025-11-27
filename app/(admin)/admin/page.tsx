@@ -1,4 +1,5 @@
 import { db } from "@/db";
+export const runtime = 'edge';
 import { products, articles, recipes, banners, videos, galleryImages } from "@/db/schema";
 
 async function getStats() {

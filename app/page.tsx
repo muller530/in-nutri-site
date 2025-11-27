@@ -1,65 +1,75 @@
-import Image from "next/image";
+import { BrandStory } from "@/components/BrandStory";
+import { CreatorsSpotlight } from "@/components/CreatorsSpotlight";
+import { Hero } from "@/components/Hero";
+import { LifestyleGrid } from "@/components/LifestyleGrid";
+import { ProductShowcase } from "@/components/ProductShowcase";
+import { ScienceHighlights } from "@/components/ScienceHighlights";
+import { SectionHeading } from "@/components/SectionHeading";
+import { SiteFooter } from "@/components/SiteFooter";
+
+const services = [
+  {
+    title: "1v1 功能营养师",
+    description: "专属营养档案 + 指标跟踪，提供控糖、轻体、修护三大模块方案。",
+  },
+  {
+    title: "超级食物冲泡指南",
+    description: "以日程表形式拆解早午晚冲泡方式，附带科学依据与注意事项。",
+  },
+  {
+    title: "可持续补充体系",
+    description: "可回收补充装、轻量包装与绿色物流，减少每一次补给的环境足迹。",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="bg-[var(--color-cream)] text-[var(--color-forest)]">
+      <Hero />
+      <BrandStory />
+
+      <section className="bg-white">
+        <div className="page-shell py-24">
+          <SectionHeading
+            eyebrow="SIGNATURE SERVICE"
+            title="不仅是产品，更是可执行的超级食物日程"
+            description="In-nutri 团队持续迭代冲泡方式、数据追踪工具与生活方式指南，让“坚持”更轻松。"
+          />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {services.map((service) => (
+              <article
+                key={service.title}
+                className="rounded-[28px] border border-[var(--color-mint)]/60 bg-[var(--color-soft-mint)] p-6 transition hover:-translate-y-1 hover:bg-white"
+              >
+                <h3 className="text-xl font-semibold text-[var(--color-forest)]">{service.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink)]/70">{service.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <ProductShowcase />
+      <ScienceHighlights />
+      <LifestyleGrid />
+      <CreatorsSpotlight />
+
+      <section className="bg-[var(--color-mint)]">
+        <div className="page-shell flex flex-col items-center gap-6 py-20 text-center">
+          <p className="text-xs uppercase tracking-[0.4em] text-[var(--color-primary)]">BOOK A TASTING</p>
+          <h3 className="text-3xl font-light text-[var(--color-forest)] sm:text-4xl">
+            预约线下感官工作坊，体验 45 分钟的超级食物诊断
+          </h3>
+          <p className="text-sm text-[var(--color-forest)]/70">
+            上海 · 北京快闪工作室限时开放，发送邮件至 hello@innutri.com 或扫描二维码即可预约。
           </p>
+          <button className="rounded-full bg-[var(--color-forest)] px-8 py-3 text-sm font-medium text-[var(--color-cream)] transition hover:-translate-y-0.5">
+            立即预约体验
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </section>
+
+      <SiteFooter />
     </div>
   );
 }

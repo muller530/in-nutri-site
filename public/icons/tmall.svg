@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <!-- 天猫 - 猫头简化版 -->
+  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+  <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+  <path d="M9 13.5c0 1.5 1.5 3 3 3s3-1.5 3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M8 7l2-1.5 2 1.5M16 7l-2-1.5-2 1.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

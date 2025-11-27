@@ -45,13 +45,17 @@ export default function EditBrandStoryPage() {
     setSaving(true);
     try {
       // 处理 storyBlocks：如果是字符串，尝试解析为数组
-      let storyBlocksArray = [];
+      let storyBlocksArray: any[] = [];
       if (formData.storyBlocks) {
         try {
           storyBlocksArray = typeof formData.storyBlocks === "string" ? JSON.parse(formData.storyBlocks) : formData.storyBlocks;
+          // 确保是数组
+          if (!Array.isArray(storyBlocksArray)) {
+            storyBlocksArray = [];
+          }
         } catch {
-          // 如果解析失败，保持原样
-          storyBlocksArray = formData.storyBlocks;
+          // 如果解析失败，使用空数组
+          storyBlocksArray = [];
         }
       }
 

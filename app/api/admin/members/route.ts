@@ -24,7 +24,10 @@ export async function GET(request: NextRequest) {
     const allMembers = await db.select().from(members);
     // Don't return password hashes
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const safeMembers = allMembers.map(({ passwordHash: _, ...member }) => member);
+    const safeMembers = allMembers.map((member: any) => {
+      const { passwordHash, ...safeMember } = member;
+      return safeMember;
+    });
     return NextResponse.json({ data: safeMembers, error: null });
   } catch (error) {
     return error as Response;

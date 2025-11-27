@@ -33,7 +33,7 @@ export default async function AdminProductsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {productList.map((product) => (
+            {productList.map((product: any) => (
               <tr key={product.id}>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{product.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{product.name}</td>

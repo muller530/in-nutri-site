@@ -1,9 +1,8 @@
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import * as schema from "./schema";
-import { createD1Database } from "./cloudflare";
 
-type DbType = ReturnType<typeof drizzle> | ReturnType<typeof createD1Database>;
+type DbType = ReturnType<typeof drizzle> | any;
 
 let dbInstance: DbType | null = null;
 
@@ -22,8 +21,19 @@ function getDbInstance(): DbType {
   // 只有在有实际 D1 绑定时才使用 D1（这意味着在运行时）
   if (hasD1Binding) {
     // Cloudflare 运行时环境：使用 D1
-    const d1Database = (globalThis as any).DB;
-    dbInstance = createD1Database(d1Database);
+    // 使用 require 动态加载，避免构建时导入
+    try {
+      const cloudflareModule = require("./cloudflare");
+      const d1Database = (globalThis as any).DB;
+      dbInstance = cloudflareModule.createD1Database(d1Database);
+    } catch (error) {
+      // 如果无法加载 D1 模块，回退到 SQLite
+      console.warn("Failed to load D1 adapter, falling back to SQLite:", error);
+      const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
+      const sqlite = new Database(dbPath);
+      sqlite.pragma("journal_mode = WAL");
+      dbInstance = drizzle(sqlite, { schema });
+    }
   } else {
     // 本地开发环境或构建时：使用 SQLite
     // 构建时如果 SQLite 文件不存在，创建一个内存数据库作为占位符

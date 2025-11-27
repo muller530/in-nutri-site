@@ -33,7 +33,7 @@ export default async function AdminArticlesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {articleList.map((article) => (
+            {articleList.map((article: any) => (
               <tr key={article.id}>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{article.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{article.title}</td>

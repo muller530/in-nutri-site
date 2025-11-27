@@ -33,7 +33,7 @@ export default async function AdminBannersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {bannerList.map((banner) => (
+            {bannerList.map((banner: any) => (
               <tr key={banner.id}>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{banner.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{banner.key}</td>

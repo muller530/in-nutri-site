@@ -33,7 +33,7 @@ export default async function AdminRecipesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {recipeList.map((recipe) => (
+            {recipeList.map((recipe: any) => (
               <tr key={recipe.id}>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{recipe.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{recipe.name}</td>

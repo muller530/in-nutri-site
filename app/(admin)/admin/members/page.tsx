@@ -34,7 +34,7 @@ export default async function AdminMembersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {memberList.map((member) => (
+            {memberList.map((member: any) => (
               <tr key={member.id}>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{member.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{member.name || "-"}</td>

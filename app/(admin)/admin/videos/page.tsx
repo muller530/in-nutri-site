@@ -34,7 +34,7 @@ export default async function AdminVideosPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {videoList.map((video) => (
+            {videoList.map((video: any) => (
               <tr key={video.id}>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{video.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{video.title}</td>

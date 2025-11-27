@@ -8,7 +8,7 @@ export async function GET() {
     const allVideos = await db.select().from(videos).where(eq(videos.isActive, true));
     
     // 优先使用上传的视频（URL以 /uploads/videos/ 开头）
-    const sortedVideos = allVideos.sort((a, b) => {
+    const sortedVideos = allVideos.sort((a: any, b: any) => {
       const aIsUploaded = a.url?.startsWith("/uploads/videos/") ? 1 : 0;
       const bIsUploaded = b.url?.startsWith("/uploads/videos/") ? 1 : 0;
       return bIsUploaded - aIsUploaded; // 上传的视频排在前面
@@ -16,7 +16,7 @@ export async function GET() {
     
     // 获取关联的产品信息
     const videosWithProducts = await Promise.all(
-      sortedVideos.map(async (video) => {
+      sortedVideos.map(async (video: any) => {
         if (video.productId) {
           const product = await db
             .select()

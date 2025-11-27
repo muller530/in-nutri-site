@@ -3,24 +3,56 @@ import Database from "better-sqlite3";
 import * as schema from "./schema";
 import { createD1Database } from "./cloudflare";
 
-// 检测运行环境
-const isCloudflare = typeof (globalThis as any).DB !== "undefined" || process.env.CF_PAGES === "1";
+type DbType = ReturnType<typeof drizzle> | ReturnType<typeof createD1Database>;
 
-let db: ReturnType<typeof drizzle> | ReturnType<typeof createD1Database>;
+let dbInstance: DbType | null = null;
 
-if (isCloudflare) {
-  // Cloudflare 环境：使用 D1
-  const d1Database = (globalThis as any).DB;
-  if (!d1Database) {
-    throw new Error("D1 database binding not found. Make sure 'DB' is configured in wrangler.toml");
+// 延迟初始化数据库连接
+function getDbInstance(): DbType {
+  if (dbInstance) {
+    return dbInstance;
   }
-  db = createD1Database(d1Database);
-} else {
-  // 本地开发环境：使用 SQLite
-  const sqlite = new Database(process.env.DATABASE_URL || "./db/sqlite.db");
-  sqlite.pragma("journal_mode = WAL");
-  db = drizzle(sqlite, { schema });
+
+  // 检测运行环境 - 只在运行时检测，构建时使用 SQLite
+  const isCloudflareRuntime = typeof (globalThis as any).DB !== "undefined";
+
+  if (isCloudflareRuntime) {
+    // Cloudflare 运行时环境：使用 D1
+    const d1Database = (globalThis as any).DB;
+    if (!d1Database) {
+      throw new Error("D1 database binding not found. Make sure 'DB' is configured in wrangler.toml");
+    }
+    dbInstance = createD1Database(d1Database);
+  } else {
+    // 本地开发环境或构建时：使用 SQLite
+    // 构建时如果 SQLite 文件不存在，创建一个内存数据库作为占位符
+    try {
+      const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
+      const sqlite = new Database(dbPath);
+      sqlite.pragma("journal_mode = WAL");
+      dbInstance = drizzle(sqlite, { schema });
+    } catch (error) {
+      // 构建时如果无法创建 SQLite 连接（文件不存在等），使用内存数据库
+      // 这允许构建继续进行，但运行时需要正确的数据库配置
+      console.warn("Using in-memory database for build:", error);
+      const sqlite = new Database(":memory:");
+      sqlite.pragma("journal_mode = WAL");
+      dbInstance = drizzle(sqlite, { schema });
+    }
+  }
+
+  return dbInstance;
 }
 
-export { db };
+// 导出代理对象，延迟初始化
+export const db = new Proxy({} as DbType, {
+  get(_target, prop) {
+    const actualDb = getDbInstance();
+    const value = (actualDb as any)[prop];
+    if (typeof value === "function") {
+      return value.bind(actualDb);
+    }
+    return value;
+  },
+});
 

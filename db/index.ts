@@ -13,15 +13,16 @@ function getDbInstance(): DbType {
     return dbInstance;
   }
 
-  // 检测运行环境 - 只在运行时检测，构建时使用 SQLite
-  const isCloudflareRuntime = typeof (globalThis as any).DB !== "undefined";
-
-  if (isCloudflareRuntime) {
+  // 检测运行环境
+  // 关键：构建时（Next.js build）永远不使用 D1，即使检测到环境变量
+  // 只有在实际运行时（请求处理时）才检测 D1 绑定
+  // 通过检查是否有实际的 D1 绑定对象来判断，而不是环境变量
+  const hasD1Binding = typeof (globalThis as any).DB !== "undefined" && (globalThis as any).DB !== null;
+  
+  // 只有在有实际 D1 绑定时才使用 D1（这意味着在运行时）
+  if (hasD1Binding) {
     // Cloudflare 运行时环境：使用 D1
     const d1Database = (globalThis as any).DB;
-    if (!d1Database) {
-      throw new Error("D1 database binding not found. Make sure 'DB' is configured in wrangler.toml");
-    }
     dbInstance = createD1Database(d1Database);
   } else {
     // 本地开发环境或构建时：使用 SQLite

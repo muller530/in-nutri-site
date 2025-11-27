@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// 注意：此路由不使用 Edge Runtime，因为需要使用文件系统
+// export const runtime = 'edge'; // 已移除，使用 Node.js runtime
 import { writeFile, mkdir } from "fs/promises";
 
 import path from "path";

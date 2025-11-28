@@ -45,30 +45,27 @@ export async function Hero() {
   const description = banner?.description || brandStory?.mission || "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。";
 
   return (
-    <header className="relative isolate overflow-hidden text-white bg-[#082317]">
-      {videoUrl ? (
+    <header className="relative isolate overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>
+      {/* 背景层 - 使用纯 CSS，不依赖外部资源 */}
+      <div className="absolute inset-0 z-0" style={{
+        background: 'linear-gradient(135deg, #0E4F2E 0%, #1a6b3f 50%, #082317 100%)',
+      }} />
+      
+      {/* 视频层 - 仅在有效 URL 时显示 */}
+      {videoUrl && (
         <video
           className="absolute inset-0 h-full w-full object-cover z-0"
           autoPlay
           muted
           loop
           playsInline
-          poster="https://images.unsplash.com/photo-1516826435551-36f4e65f2230?auto=format&fit=crop&w=1600&q=80"
         >
           <source src={videoUrl} type="video/mp4" />
         </video>
-      ) : (
-        <>
-          <div
-            className="absolute inset-0 bg-cover bg-center z-0"
-            style={{
-              backgroundImage: "url(https://images.unsplash.com/photo-1516826435551-36f4e65f2230?auto=format&fit=crop&w=1600&q=80)",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0E4F2E] via-[#1a6b3f] to-[#082317] z-0" />
-        </>
       )}
-      <div className="absolute inset-0 bg-[#082317]/60 z-10" />
+      
+      {/* 遮罩层 */}
+      <div className="absolute inset-0 bg-[#082317]/50 z-10" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#2fb54a33,transparent_50%),radial-gradient(circle_at_80%_20%,#e7f6ec44,transparent_60%)] z-20" />
       <div className="absolute left-1/2 top-10 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#2fb54a22] blur-[160px] z-20" />
       <div className="absolute inset-0 opacity-40 z-20">

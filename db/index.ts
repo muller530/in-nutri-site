@@ -74,29 +74,53 @@ function getDbInstance(): DbType {
 
   // 本地开发环境：使用 SQLite
   // 只有在非 Edge Runtime 时才执行这段代码
-  // 使用 eval 来完全避免静态分析
   try {
-    // 使用 Function 构造函数来避免静态分析
-    const loadSQLite = new Function('return require("drizzle-orm/better-sqlite3")');
-    const loadDatabase = new Function('return require("better-sqlite3")');
-    const { drizzle } = loadSQLite();
-    const Database = loadDatabase().default || loadDatabase();
-    const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
-    const sqlite = new Database(dbPath);
-    sqlite.pragma("journal_mode = WAL");
-    dbInstance = drizzle(sqlite, { schema });
-    return dbInstance;
+    // 在 Node.js 环境中，直接使用 require
+    if (typeof require !== "undefined") {
+      const { drizzle } = require("drizzle-orm/better-sqlite3");
+      const Database = require("better-sqlite3");
+      const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
+      const sqlite = new Database(dbPath);
+      sqlite.pragma("journal_mode = WAL");
+      dbInstance = drizzle(sqlite, { schema });
+      return dbInstance;
+    } else {
+      // 如果 require 不可用，使用 Function 构造函数
+      const loadSQLite = new Function('return require("drizzle-orm/better-sqlite3")');
+      const loadDatabase = new Function('return require("better-sqlite3")');
+      const { drizzle } = loadSQLite();
+      const Database = loadDatabase().default || loadDatabase();
+      const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
+      const sqlite = new Database(dbPath);
+      sqlite.pragma("journal_mode = WAL");
+      dbInstance = drizzle(sqlite, { schema });
+      return dbInstance;
+    }
   } catch (error) {
     // 如果无法创建 SQLite 连接，使用内存数据库
     console.warn("Using in-memory database:", error);
-    const loadSQLite = new Function('return require("drizzle-orm/better-sqlite3")');
-    const loadDatabase = new Function('return require("better-sqlite3")');
-    const { drizzle } = loadSQLite();
-    const Database = loadDatabase().default || loadDatabase();
-    const sqlite = new Database(":memory:");
-    sqlite.pragma("journal_mode = WAL");
-    dbInstance = drizzle(sqlite, { schema });
-    return dbInstance;
+    try {
+      if (typeof require !== "undefined") {
+        const { drizzle } = require("drizzle-orm/better-sqlite3");
+        const Database = require("better-sqlite3");
+        const sqlite = new Database(":memory:");
+        sqlite.pragma("journal_mode = WAL");
+        dbInstance = drizzle(sqlite, { schema });
+        return dbInstance;
+      } else {
+        const loadSQLite = new Function('return require("drizzle-orm/better-sqlite3")');
+        const loadDatabase = new Function('return require("better-sqlite3")');
+        const { drizzle } = loadSQLite();
+        const Database = loadDatabase().default || loadDatabase();
+        const sqlite = new Database(":memory:");
+        sqlite.pragma("journal_mode = WAL");
+        dbInstance = drizzle(sqlite, { schema });
+        return dbInstance;
+      }
+    } catch (innerError) {
+      console.error("Failed to create in-memory database:", innerError);
+      throw innerError;
+    }
   }
 }
 

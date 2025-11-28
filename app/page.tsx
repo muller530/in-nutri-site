@@ -1,23 +1,75 @@
-// 最简单的测试页面
-export default function Home() {
+import { BrandStory } from "@/components/BrandStory";
+import { CreatorsSpotlight } from "@/components/CreatorsSpotlight";
+import { Hero } from "@/components/Hero";
+import { LifestyleGrid } from "@/components/LifestyleGrid";
+import { ProductShowcase } from "@/components/ProductShowcase";
+import { ScienceHighlights } from "@/components/ScienceHighlights";
+import { SectionHeading } from "@/components/SectionHeading";
+import { SiteFooter } from "@/components/SiteFooter";
+
+const services = [
+  {
+    title: "1v1 功能营养师",
+    description: "专属营养档案 + 指标跟踪，提供控糖、轻体、修护三大模块方案。",
+  },
+  {
+    title: "超级食物冲泡指南",
+    description: "以日程表形式拆解早午晚冲泡方式，附带科学依据与注意事项。",
+  },
+  {
+    title: "可持续补充体系",
+    description: "可回收补充装、轻量包装与绿色物流，减少每一次补给的环境足迹。",
+  },
+];
+
+export default async function Home() {
   return (
-    <div style={{ padding: "40px", backgroundColor: "#f7f5ef", minHeight: "100vh", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ color: "#0e4f2e", fontSize: "32px", margin: 0, marginBottom: "20px" }}>测试页面</h1>
-      <p style={{ color: "#222222", fontSize: "16px", margin: 0, marginBottom: "20px" }}>
-        如果你能看到这个页面，说明基本渲染正常。
-      </p>
-      <div style={{ 
-        marginTop: "20px", 
-        padding: "20px", 
-        backgroundColor: "#2fb54a", 
-        color: "white", 
-        borderRadius: "8px" 
-      }}>
-        <p style={{ margin: 0 }}>这是一个完全静态的测试页面，不依赖任何组件或 API。</p>
-        <p style={{ margin: "10px 0 0 0", fontSize: "14px" }}>
-          开发服务器地址：<a href="http://localhost:3000" style={{ color: "white", textDecoration: "underline" }}>http://localhost:3000</a>
-        </p>
-      </div>
+    <div className="bg-[var(--color-cream)] text-[var(--color-forest)]">
+      <Hero />
+      <BrandStory />
+
+      <section className="bg-white">
+        <div className="page-shell py-24">
+          <SectionHeading
+            eyebrow="SIGNATURE SERVICE"
+            title="不仅是产品，更是可执行的超级食物日程"
+            description="In-nutri 团队持续迭代冲泡方式、数据追踪工具与生活方式指南，让"坚持"更轻松。"
+          />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {services.map((service) => (
+              <article
+                key={service.title}
+                className="rounded-[28px] border border-[var(--color-mint)]/60 bg-[var(--color-soft-mint)] p-6 transition hover:-translate-y-1 hover:bg-white"
+              >
+                <h3 className="text-xl font-semibold text-[var(--color-forest)]">{service.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[#222222]/70">{service.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <ProductShowcase />
+      <ScienceHighlights />
+      <LifestyleGrid />
+      <CreatorsSpotlight />
+
+      <section className="bg-[var(--color-mint)]">
+        <div className="page-shell flex flex-col items-center gap-6 py-20 text-center">
+          <p className="text-xs uppercase tracking-[0.4em] text-[var(--color-primary)]">BOOK A TASTING</p>
+          <h3 className="text-3xl font-light text-[var(--color-forest)] sm:text-4xl">
+            预约线下感官工作坊，体验 45 分钟的超级食物诊断
+          </h3>
+          <p className="text-sm text-[var(--color-forest)]/70">
+            上海 · 北京快闪工作室限时开放，发送邮件至 hello@innutri.com 或扫描二维码即可预约。
+          </p>
+          <button className="rounded-full bg-[var(--color-forest)] px-8 py-3 text-sm font-medium text-[var(--color-cream)] transition hover:-translate-y-0.5">
+            立即预约体验
+          </button>
+        </div>
+      </section>
+
+      <SiteFooter />
     </div>
   );
 }

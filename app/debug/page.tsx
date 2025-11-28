@@ -1,4 +1,6 @@
 // 诊断页面 - 检查各个组件和 API 是否正常工作
+export const runtime = 'edge';
+
 export default async function DebugPage() {
   const checks = [];
 
@@ -7,7 +9,11 @@ export default async function DebugPage() {
 
   // 检查 2: API 路由
   try {
-    const res = await fetch("http://localhost:3000/api/banners", {
+    // 在 Cloudflare Pages 上使用相对路径
+    const apiUrl = typeof window === "undefined" && process.env.CF_PAGES
+      ? "/api/banners"
+      : "http://localhost:3000/api/banners";
+    const res = await fetch(apiUrl, {
       cache: "no-store",
     });
     if (res.ok) {

@@ -6,12 +6,10 @@ export function getApiUrl(path: string): string {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
       return `${baseUrl}${path}`;
     }
-    // Cloudflare Pages 生产环境
-    // 在 Edge Runtime 中，Server Component 的 fetch 需要绝对 URL
-    // 尝试从请求头获取，如果没有则使用相对路径（Next.js 会自动处理）
-    // 注意：在 Cloudflare Pages 上，相对路径应该可以工作
-    // 但如果不行，我们需要使用环境变量或请求头
+    // 生产环境（EdgeOne、Cloudflare Pages 等）
+    // 优先使用环境变量配置的 base URL
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                    process.env.EDGEONE_URL ||
                     process.env.CF_PAGES_URL || 
                     "";
     
@@ -20,7 +18,7 @@ export function getApiUrl(path: string): string {
     }
     
     // 如果没有配置 base URL，使用相对路径
-    // Next.js 在 Edge Runtime 中应该能处理相对路径的 fetch
+    // Next.js 在 Node.js Runtime 中可以处理相对路径的 fetch
     return path;
   }
   // 客户端，使用相对路径

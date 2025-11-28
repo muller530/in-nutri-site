@@ -7,7 +7,8 @@ import { ScienceHighlights } from "@/components/ScienceHighlights";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SiteFooter } from "@/components/SiteFooter";
 
-export const runtime = 'edge';
+// 移除 Edge Runtime 限制，确保本地和 EdgeOne 都能正常工作
+// export const runtime = 'edge';
 
 const services = [
   {

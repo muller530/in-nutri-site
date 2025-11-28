@@ -5,9 +5,14 @@ import { getApiUrl } from "@/lib/api";
 
 async function getBanner() {
   try {
-    const res = await fetch(getApiUrl("/api/banners"), {
+    const apiUrl = getApiUrl("/api/banners");
+    const res = await fetch(apiUrl, {
       cache: "no-store",
     });
+    if (!res.ok) {
+      console.warn("Banner API returned non-OK status:", res.status);
+      return null;
+    }
     const data = await res.json();
     const banners = data.data || [];
     interface Banner {
@@ -18,19 +23,26 @@ async function getBanner() {
       description?: string;
     }
     return banners.find((b: Banner) => b.key === "home-hero") || banners[0] || null;
-  } catch {
+  } catch (error) {
+    console.error("Error fetching banner:", error);
     return null;
   }
 }
 
 async function getBrandStory() {
   try {
-    const res = await fetch(getApiUrl("/api/brand-story"), {
+    const apiUrl = getApiUrl("/api/brand-story");
+    const res = await fetch(apiUrl, {
       cache: "no-store",
     });
+    if (!res.ok) {
+      console.warn("Brand story API returned non-OK status:", res.status);
+      return null;
+    }
     const data = await res.json();
     return data.data;
-  } catch {
+  } catch (error) {
+    console.error("Error fetching brand story:", error);
     return null;
   }
 }
@@ -73,7 +85,21 @@ export async function Hero() {
       </div>
 
       <div className="page-shell relative z-30 flex min-h-screen flex-col items-center justify-center gap-10 py-24 text-center">
-        <Image src="/logo.png" width={260} height={80} alt="In Nutri 标志" priority className="mt-16 drop-shadow-lg" />
+        <div className="mt-16">
+          <Image 
+            src="/logo.png" 
+            width={260} 
+            height={80} 
+            alt="In Nutri 标志" 
+            priority 
+            className="drop-shadow-lg"
+            onError={(e) => {
+              console.error("Logo image failed to load");
+              // 如果图片加载失败，隐藏图片元素
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        </div>
         <div className="space-y-6 max-w-3xl">
           <h1 className="text-4xl font-light leading-tight tracking-wide sm:text-5xl lg:text-6xl">
             {title}

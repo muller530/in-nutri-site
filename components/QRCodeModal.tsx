@@ -1,18 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
+import { QRCodeSVG } from "react-qr-code";
 import { X } from "lucide-react";
-
-// 使用动态导入并确保只加载一次
-// 使用 loading 属性来避免重复渲染
-const QRCodeSVG = dynamic(
-  () => import("qrcode.react").then((mod) => mod.QRCodeSVG),
-  { 
-    ssr: false,
-    loading: () => <div className="h-[200px] w-[200px] animate-pulse bg-gray-200 rounded-lg" />,
-  }
-);
 
 interface QRCodeModalProps {
   url: string;
@@ -52,7 +41,13 @@ export function QRCodeModal({ url, platform, isOpen, onClose }: QRCodeModalProps
             扫描二维码访问{platformLabels[platform]}
           </h3>
           <div className="rounded-lg border-4 border-white bg-white p-4 shadow-lg">
-            <QRCodeSVG value={url} size={200} level="H" />
+            <QRCodeSVG 
+              value={url} 
+              size={200}
+              level="H"
+              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+              viewBox={`0 0 200 200`}
+            />
           </div>
           <p className="text-sm text-gray-500">使用手机扫描二维码</p>
         </div>

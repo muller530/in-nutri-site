@@ -1,0 +1,20 @@
+{
+  "name": "in-nutri-site",
+  "version": "1.0.0",
+  "description": "In-nutri 品牌官网",
+  "build": {
+    "command": "npm run build",
+    "output": ".next",
+    "install": "npm install --production"
+  },
+  "runtime": {
+    "node": "18.x"
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "DATABASE_URL": "./db/sqlite.db",
+    "NEXT_PUBLIC_BASE_URL": "https://your-site.edgeone.com",
+    "SESSION_SECRET": "请替换为随机字符串"
+  }
+}
+

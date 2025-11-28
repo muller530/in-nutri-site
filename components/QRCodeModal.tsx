@@ -1,6 +1,7 @@
 "use client";
 
-import QRCodeSVG from "react-qr-code";
+import { useEffect, useRef } from "react";
+import QRCode from "qrcode";
 import { X } from "lucide-react";
 
 interface QRCodeModalProps {
@@ -18,6 +19,23 @@ const platformLabels: Record<string, string> = {
 };
 
 export function QRCodeModal({ url, platform, isOpen, onClose }: QRCodeModalProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (isOpen && canvasRef.current && url) {
+      QRCode.toCanvas(canvasRef.current, url, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      }).catch((err) => {
+        console.error("生成二维码失败:", err);
+      });
+    }
+  }, [isOpen, url]);
+
   if (!isOpen) return null;
 
   return (
@@ -41,13 +59,7 @@ export function QRCodeModal({ url, platform, isOpen, onClose }: QRCodeModalProps
             扫描二维码访问{platformLabels[platform]}
           </h3>
           <div className="rounded-lg border-4 border-white bg-white p-4 shadow-lg">
-            <QRCodeSVG 
-              value={url} 
-              size={200}
-              level="H"
-              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-              viewBox={`0 0 200 200`}
-            />
+            <canvas ref={canvasRef} className="h-[200px] w-[200px]" />
           </div>
           <p className="text-sm text-gray-500">使用手机扫描二维码</p>
         </div>

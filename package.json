@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@adminjs/express": "^6.1.1",
+    "@types/qrcode": "^1.5.6",
     "adminjs": "^7.8.17",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.4.6",
@@ -25,9 +26,9 @@
     "drizzle-orm": "^0.44.7",
     "lucide-react": "^0.555.0",
     "next": "^15.5.2",
+    "qrcode": "^1.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-qr-code": "^2.0.18",
     "uuid": "^13.0.0",
     "zod": "^4.1.13"
   },

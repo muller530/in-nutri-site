@@ -58,12 +58,15 @@ export async function Hero() {
           <source src={videoUrl} type="video/mp4" />
         </video>
       ) : (
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: "url(https://images.unsplash.com/photo-1516826435551-36f4e65f2230?auto=format&fit=crop&w=1600&q=80)",
-          }}
-        />
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: "url(https://images.unsplash.com/photo-1516826435551-36f4e65f2230?auto=format&fit=crop&w=1600&q=80)",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0E4F2E] via-[#1a6b3f] to-[#082317]" />
+        </>
       )}
       <div className="absolute inset-0 bg-[#082317]/70" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#2fb54a33,transparent_50%),radial-gradient(circle_at_80%_20%,#e7f6ec44,transparent_60%)]" />

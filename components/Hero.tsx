@@ -60,9 +60,22 @@ async function getBrandStory() {
 
 export async function Hero() {
   // 尝试获取数据，如果失败则使用默认值
-  const banner = await getBanner();
-  const brandStory = await getBrandStory();
+  let banner = null;
+  let brandStory = null;
+  
+  try {
+    banner = await getBanner();
+  } catch (error) {
+    console.error("Failed to get banner, using defaults:", error);
+  }
+  
+  try {
+    brandStory = await getBrandStory();
+  } catch (error) {
+    console.error("Failed to get brand story, using defaults:", error);
+  }
 
+  // 确保始终有默认值，即使所有 API 调用都失败
   const videoUrl = banner?.image || "";
   const title = brandStory?.heroTitle || banner?.title || "In-nutri · 有态度的超级食物";
   const subtitle = brandStory?.heroSubtitle || banner?.subtitle || "源自真实原料";

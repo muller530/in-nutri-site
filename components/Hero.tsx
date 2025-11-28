@@ -1,60 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HeroClient } from "./HeroClient";
-import { getApiUrl } from "@/lib/api";
 
-async function getBanner() {
-  try {
-    const apiUrl = getApiUrl("/api/banners");
-    const res = await fetch(apiUrl, {
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      console.warn("Banner API returned non-OK status:", res.status);
-      return null;
-    }
-    const data = await res.json();
-    const banners = data.data || [];
-    interface Banner {
-      key: string;
-      image?: string;
-      title?: string;
-      subtitle?: string;
-      description?: string;
-    }
-    return banners.find((b: Banner) => b.key === "home-hero") || banners[0] || null;
-  } catch (error) {
-    console.error("Error fetching banner:", error);
-    return null;
-  }
-}
-
-async function getBrandStory() {
-  try {
-    const apiUrl = getApiUrl("/api/brand-story");
-    const res = await fetch(apiUrl, {
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      console.warn("Brand story API returned non-OK status:", res.status);
-      return null;
-    }
-    const data = await res.json();
-    return data.data;
-  } catch (error) {
-    console.error("Error fetching brand story:", error);
-    return null;
-  }
-}
-
+// 暂时移除所有 API 调用，使用静态内容
+// 这样可以确保即使数据库连接失败，页面也能正常显示
 export async function Hero() {
-  const banner = await getBanner();
-  const brandStory = await getBrandStory();
-
-  const videoUrl = banner?.image || "";
-  const title = brandStory?.heroTitle || banner?.title || "In-nutri · 有态度的超级食物";
-  const subtitle = brandStory?.heroSubtitle || banner?.subtitle || "源自真实原料";
-  const description = banner?.description || brandStory?.mission || "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。";
+  // 使用静态默认值，不调用任何 API
+  const title = "In-nutri · 有态度的超级食物";
+  const subtitle = "源自真实原料";
+  const description = "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。";
+  const videoUrl = ""; // 不使用视频，只使用 CSS 渐变背景
 
   return (
     <header className="relative isolate overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>
@@ -104,7 +59,10 @@ export async function Hero() {
           <h1 className="text-4xl font-light leading-tight tracking-wide sm:text-5xl lg:text-6xl">
             {title}
           </h1>
-          <HeroClient defaultPhrase={subtitle} />
+          {/* 暂时使用简单的文本，不使用打字效果 */}
+          <div className="text-2xl font-semibold text-[#e9ffec]">
+            {subtitle}
+          </div>
           <p className="text-base text-white/80 sm:text-lg">
             {description}
           </p>

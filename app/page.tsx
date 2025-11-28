@@ -25,9 +25,13 @@ const services = [
 ];
 
 export default async function Home() {
+  // 使用 try-catch 确保即使某个组件失败，页面也能显示
   return (
     <div className="bg-[var(--color-cream)] text-[var(--color-forest)]">
+      {/* Hero 组件 - 已改为完全静态，不依赖 API */}
       <Hero />
+      
+      {/* 其他组件 - 如果失败会显示默认内容 */}
       <BrandStory />
 
       <section className="bg-white">

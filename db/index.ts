@@ -13,9 +13,10 @@ function isEdgeRuntime(): boolean {
   }
   // 检查是否在构建时（Next.js build）
   // 在构建时，假设是 Edge Runtime（避免导入 better-sqlite3）
-  return typeof process === "undefined" || 
+  const isBuildTime = typeof process === "undefined" || 
          process.env.NEXT_PHASE === "phase-production-build" ||
          (process.env.NODE_ENV === "production" && !process.env.CF_PAGES_BRANCH);
+  return isBuildTime;
 }
 
 // 延迟初始化数据库连接
@@ -24,35 +25,42 @@ function getDbInstance(): DbType {
     return dbInstance;
   }
 
+  const isEdge = isEdgeRuntime();
+
   // 如果在 Edge Runtime 中，使用 D1
-  if (isEdgeRuntime()) {
+  if (isEdge) {
     // Cloudflare 运行时环境：使用 D1
     try {
       // 使用 require 动态加载，避免构建时导入
       const cloudflareModule = require("./cloudflare");
       const d1Database = (globalThis as any).DB;
-      dbInstance = cloudflareModule.createD1Database(d1Database);
-      return dbInstance;
+      if (d1Database) {
+        dbInstance = cloudflareModule.createD1Database(d1Database);
+        return dbInstance;
+      }
     } catch (error) {
-      // 在构建时，如果无法加载 D1，创建一个占位符对象
-      // 这允许构建继续进行
-      console.warn("D1 not available, using placeholder:", error);
-      // 返回一个占位符对象，避免构建失败
-      dbInstance = {
-        select: () => ({ from: () => ({ where: () => Promise.resolve([]) }) }),
-        insert: () => ({ values: () => ({ returning: () => Promise.resolve([]) }) }),
-        update: () => ({ set: () => ({ where: () => Promise.resolve([]) }) }),
-        delete: () => ({ where: () => Promise.resolve([]) }),
-      };
-      return dbInstance;
+      // 忽略错误，继续使用占位符
     }
+    // 在构建时或 D1 不可用时，创建一个占位符对象
+    // 这允许构建继续进行
+    dbInstance = {
+      select: () => ({ from: () => ({ where: () => Promise.resolve([]) }) }),
+      insert: () => ({ values: () => ({ returning: () => Promise.resolve([]) }) }),
+      update: () => ({ set: () => ({ where: () => Promise.resolve([]) }) }),
+      delete: () => ({ where: () => Promise.resolve([]) }),
+    };
+    return dbInstance;
   }
 
   // 本地开发环境：使用 SQLite
-  // 使用 require 而不是 import，避免在 Edge Runtime 中被分析
+  // 只有在非 Edge Runtime 时才执行这段代码
+  // 使用 eval 来完全避免静态分析
   try {
-    const { drizzle } = require("drizzle-orm/better-sqlite3");
-    const Database = require("better-sqlite3");
+    // 使用 Function 构造函数来避免静态分析
+    const loadSQLite = new Function('return require("drizzle-orm/better-sqlite3")');
+    const loadDatabase = new Function('return require("better-sqlite3")');
+    const { drizzle } = loadSQLite();
+    const Database = loadDatabase().default || loadDatabase();
     const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
     const sqlite = new Database(dbPath);
     sqlite.pragma("journal_mode = WAL");
@@ -61,8 +69,10 @@ function getDbInstance(): DbType {
   } catch (error) {
     // 如果无法创建 SQLite 连接，使用内存数据库
     console.warn("Using in-memory database:", error);
-    const { drizzle } = require("drizzle-orm/better-sqlite3");
-    const Database = require("better-sqlite3");
+    const loadSQLite = new Function('return require("drizzle-orm/better-sqlite3")');
+    const loadDatabase = new Function('return require("better-sqlite3")');
+    const { drizzle } = loadSQLite();
+    const Database = loadDatabase().default || loadDatabase();
     const sqlite = new Database(":memory:");
     sqlite.pragma("journal_mode = WAL");
     dbInstance = drizzle(sqlite, { schema });

@@ -9,8 +9,13 @@ async function getBanner() {
     const apiUrl = getApiUrl("/api/banners");
     const res = await fetch(apiUrl, {
       cache: "no-store",
+      // 在 Edge Runtime 中，确保 fetch 能正常工作
+      headers: {
+        'Accept': 'application/json',
+      },
     });
     if (!res.ok) {
+      console.warn("Banner API returned non-OK status:", res.status);
       return null;
     }
     const data = await res.json();
@@ -25,6 +30,7 @@ async function getBanner() {
     return banners.find((b: Banner) => b.key === "home-hero") || banners[0] || null;
   } catch (error) {
     console.error("Error fetching banner:", error);
+    // 返回 null，让组件使用默认值
     return null;
   }
 }
@@ -34,14 +40,20 @@ async function getBrandStory() {
     const apiUrl = getApiUrl("/api/brand-story");
     const res = await fetch(apiUrl, {
       cache: "no-store",
+      // 在 Edge Runtime 中，确保 fetch 能正常工作
+      headers: {
+        'Accept': 'application/json',
+      },
     });
     if (!res.ok) {
+      console.warn("Brand story API returned non-OK status:", res.status);
       return null;
     }
     const data = await res.json();
     return data.data;
   } catch (error) {
     console.error("Error fetching brand story:", error);
+    // 返回 null，让组件使用默认值
     return null;
   }
 }

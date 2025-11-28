@@ -7,13 +7,20 @@ export function getApiUrl(path: string): string {
       return `${baseUrl}${path}`;
     }
     // Cloudflare Pages 生产环境
-    // 在 Cloudflare Pages 上，Server Component 中的 fetch 可以使用相对路径
-    // 但为了确保兼容性，我们检查是否有 CF_PAGES 环境变量
-    if (process.env.CF_PAGES) {
-      // 在 Cloudflare Pages 上，使用相对路径
-      return path;
+    // 在 Edge Runtime 中，Server Component 的 fetch 需要绝对 URL
+    // 尝试从请求头获取，如果没有则使用相对路径（Next.js 会自动处理）
+    // 注意：在 Cloudflare Pages 上，相对路径应该可以工作
+    // 但如果不行，我们需要使用环境变量或请求头
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                    process.env.CF_PAGES_URL || 
+                    "";
+    
+    if (baseUrl) {
+      return `${baseUrl}${path}`;
     }
-    // 其他生产环境，尝试使用相对路径
+    
+    // 如果没有配置 base URL，使用相对路径
+    // Next.js 在 Edge Runtime 中应该能处理相对路径的 fetch
     return path;
   }
   // 客户端，使用相对路径

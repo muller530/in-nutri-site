@@ -8,14 +8,15 @@ let dbInstance: DbType | null = null;
 // 检测是否在 Edge Runtime 中（构建时或 Cloudflare 运行时）
 function isEdgeRuntime(): boolean {
   // 检查是否有 D1 绑定（Cloudflare 环境）
-  if (typeof (globalThis as any).DB !== "undefined" && (globalThis as any).DB !== null) {
+  // 在 Cloudflare Pages 运行时，globalThis.DB 会被注入
+  if (typeof globalThis !== "undefined" && (globalThis as any).DB !== undefined && (globalThis as any).DB !== null) {
     return true;
   }
   // 检查是否在构建时（Next.js build）
   // 在构建时，假设是 Edge Runtime（避免导入 better-sqlite3）
   const isBuildTime = typeof process === "undefined" || 
          process.env.NEXT_PHASE === "phase-production-build" ||
-         (process.env.NODE_ENV === "production" && !process.env.CF_PAGES_BRANCH);
+         (process.env.NODE_ENV === "production" && !process.env.CF_PAGES_BRANCH && !process.env.DATABASE_URL);
   return isBuildTime;
 }
 
@@ -35,19 +36,38 @@ function getDbInstance(): DbType {
       const cloudflareModule = require("./cloudflare");
       const d1Database = (globalThis as any).DB;
       if (d1Database) {
+        console.log("使用 D1 数据库");
         dbInstance = cloudflareModule.createD1Database(d1Database);
         return dbInstance;
+      } else {
+        console.warn("D1 数据库绑定未找到，使用占位符");
       }
     } catch (error) {
-      // 忽略错误，继续使用占位符
+      console.error("加载 D1 适配器失败:", error);
     }
     // 在构建时或 D1 不可用时，创建一个占位符对象
-    // 这允许构建继续进行
+    // 这允许构建继续进行，但查询会返回空数组
     dbInstance = {
-      select: () => ({ from: () => ({ where: () => Promise.resolve([]) }) }),
-      insert: () => ({ values: () => ({ returning: () => Promise.resolve([]) }) }),
-      update: () => ({ set: () => ({ where: () => Promise.resolve([]) }) }),
-      delete: () => ({ where: () => Promise.resolve([]) }),
+      select: () => ({ 
+        from: () => ({ 
+          where: () => Promise.resolve([]),
+          limit: () => Promise.resolve([]),
+          orderBy: () => Promise.resolve([]),
+        }),
+      }),
+      insert: () => ({ 
+        values: () => ({ 
+          returning: () => Promise.resolve([]) 
+        }) 
+      }),
+      update: () => ({ 
+        set: () => ({ 
+          where: () => Promise.resolve([]) 
+        }) 
+      }),
+      delete: () => ({ 
+        where: () => Promise.resolve([]) 
+      }),
     };
     return dbInstance;
   }

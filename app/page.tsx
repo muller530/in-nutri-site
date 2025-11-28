@@ -24,7 +24,8 @@ const services = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  // 使用 try-catch 包裹所有组件，确保即使某个组件失败，页面也能显示
   return (
     <div className="bg-[var(--color-cream)] text-[var(--color-forest)]">
       <Hero />

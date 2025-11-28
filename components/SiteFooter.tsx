@@ -22,7 +22,13 @@ export async function SiteFooter() {
     <footer className="bg-[var(--color-forest)] text-[var(--color-cream)]">
       <div className="page-shell flex flex-col gap-10 py-16 md:flex-row md:items-center md:justify-between">
         <div className="space-y-3">
-          <Image src="/logo.png" width={180} height={56} alt="In Nutri 标志" />
+          <Image 
+            src="/logo.png" 
+            width={180} 
+            height={56} 
+            alt="In Nutri 标志"
+            unoptimized={process.env.NODE_ENV === 'production'}
+          />
           <p className="text-2xl font-semibold">有态度的超级食物</p>
           <p className="text-sm text-white/70">
             我们与世界各地的原料农场合作，以透明检测与诚实配方打造每一勺冲泡体验。

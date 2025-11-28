@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ScrollReset } from "@/components/ScrollReset";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,7 +35,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${inter.variable} antialiased`} style={{ margin: 0, padding: 0 }}>
+      <body className={`${inter.variable} antialiased bg-[var(--color-cream)]`}>
+        <ScrollReset />
         {children}
       </body>
     </html>

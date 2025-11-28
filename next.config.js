@@ -22,8 +22,6 @@ const nextConfig = {
     }
     return config;
   },
-  // 将 better-sqlite3 标记为服务器组件外部包
-  serverComponentsExternalPackages: ["better-sqlite3"],
 };
 
 module.exports = nextConfig;

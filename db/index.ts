@@ -14,8 +14,9 @@ function isEdgeRuntime(): boolean {
   }
   // 检查是否在构建时（Next.js build）
   // 在构建时，假设是 Edge Runtime（避免导入 better-sqlite3）
+  // 但如果设置了 DATABASE_URL，说明是本地开发环境，应该使用 SQLite
   const isBuildTime = typeof process === "undefined" || 
-         process.env.NEXT_PHASE === "phase-production-build" ||
+         (process.env.NEXT_PHASE === "phase-production-build" && !process.env.DATABASE_URL) ||
          (process.env.NODE_ENV === "production" && !process.env.CF_PAGES_BRANCH && !process.env.DATABASE_URL);
   return isBuildTime;
 }
@@ -32,8 +33,11 @@ function getDbInstance(): DbType {
   if (isEdge) {
     // Cloudflare 运行时环境：使用 D1
     try {
-      // 使用 require 动态加载，避免构建时导入
-      const cloudflareModule = require("./cloudflare");
+      // 使用动态 require，避免构建时导入
+      const requireFunc = typeof require !== "undefined" ? require : (() => {
+        throw new Error("require is not available");
+      });
+      const cloudflareModule = requireFunc("./cloudflare");
       const d1Database = (globalThis as any).DB;
       if (d1Database) {
         console.log("使用 D1 数据库");
@@ -74,41 +78,37 @@ function getDbInstance(): DbType {
 
   // 本地开发环境：使用 SQLite
   // 只有在非 Edge Runtime 时才执行这段代码
-  // 使用字符串拼接和 eval 来完全避免静态分析
+  // 在 Node.js runtime 中，require 是可用的
   try {
-    // 使用字符串拼接来避免静态分析
-    const drizzleModule = "drizzle-orm" + "/better-sqlite3";
-    const dbModule = "better" + "-sqlite3";
+    // 在 Node.js runtime 中，直接使用 require
+    if (typeof require === "undefined") {
+      throw new Error("require is not available in this environment");
+    }
     
-    // 使用 Function 构造函数，通过字符串拼接避免静态分析
-    const loadSQLite = new Function('m', 'return require(m)').bind(null, drizzleModule);
-    const loadDatabase = new Function('m', 'return require(m)').bind(null, dbModule);
+    const drizzleModule = require("drizzle-orm/better-sqlite3");
+    const Database = require("better-sqlite3");
     
-    const { drizzle } = loadSQLite();
-    const Database = loadDatabase().default || loadDatabase();
+    const { drizzle } = drizzleModule;
     const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
     const sqlite = new Database(dbPath);
     sqlite.pragma("journal_mode = WAL");
     dbInstance = drizzle(sqlite, { schema });
+    console.log("使用 SQLite 数据库:", dbPath);
     return dbInstance;
   } catch (error) {
     // 如果无法创建 SQLite 连接，使用内存数据库
-    console.warn("Using in-memory database:", error);
+    console.warn("使用内存数据库:", error);
     try {
-      const drizzleModule = "drizzle-orm" + "/better-sqlite3";
-      const dbModule = "better" + "-sqlite3";
+      const drizzleModule = require("drizzle-orm/better-sqlite3");
+      const Database = require("better-sqlite3");
       
-      const loadSQLite = new Function('m', 'return require(m)').bind(null, drizzleModule);
-      const loadDatabase = new Function('m', 'return require(m)').bind(null, dbModule);
-      
-      const { drizzle } = loadSQLite();
-      const Database = loadDatabase().default || loadDatabase();
+      const { drizzle } = drizzleModule;
       const sqlite = new Database(":memory:");
       sqlite.pragma("journal_mode = WAL");
       dbInstance = drizzle(sqlite, { schema });
       return dbInstance;
     } catch (innerError) {
-      console.error("Failed to create in-memory database:", innerError);
+      console.error("创建内存数据库失败:", innerError);
       throw innerError;
     }
   }

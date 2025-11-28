@@ -6,7 +6,8 @@ import { requireAdmin } from "@/lib/auth";
 
 import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
 
-export const runtime = 'edge';
+// 使用 Node.js runtime，因为 requireAdmin 需要数据库连接
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {

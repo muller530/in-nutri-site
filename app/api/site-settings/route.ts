@@ -4,7 +4,8 @@ import { db } from "@/db";
 
 import { siteSettings } from "@/db/schema";
 
-export const runtime = 'edge';
+// 使用 Node.js runtime，因为数据库连接在 Edge Runtime 中无法正常工作
+export const runtime = 'nodejs';
 // GET: 获取站点设置（公开）
 export async function GET() {
   try {

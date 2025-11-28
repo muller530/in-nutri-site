@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HeroClient } from "./HeroClient";
+import { VideoBackground } from "./VideoBackground";
 
 import { getApiUrl } from "@/lib/api";
 
@@ -76,10 +77,52 @@ export async function Hero() {
   }
 
   // 确保始终有默认值，即使所有 API 调用都失败
-  const videoUrl = banner?.image || "";
+  let videoUrl = banner?.image || "";
+  
+  // 修复：如果 URL 是简单的文件名（如 "video.mp4"），尝试查找上传目录中的文件
+  if (videoUrl && !videoUrl.startsWith('/') && !videoUrl.startsWith('http') && !videoUrl.startsWith('https')) {
+    // 如果只是文件名，尝试在 uploads/videos 目录中查找
+    if (videoUrl.endsWith('.mp4') || videoUrl.endsWith('.mov') || videoUrl.endsWith('.avi') || videoUrl.endsWith('.webm')) {
+      videoUrl = `/uploads/videos/${videoUrl}`;
+      if (typeof window === "undefined") {
+        console.warn("检测到不完整的视频路径，已自动修复:", videoUrl);
+      }
+    } else {
+      // 如果既不是完整路径也不是视频文件，清空
+      videoUrl = "";
+      if (typeof window === "undefined") {
+        console.warn("检测到无效的视频路径，已清空:", banner?.image);
+      }
+    }
+  }
+  
+  // 确保路径以 / 开头（相对路径）
+  if (videoUrl && !videoUrl.startsWith('http') && !videoUrl.startsWith('https') && !videoUrl.startsWith('/')) {
+    videoUrl = `/${videoUrl}`;
+  }
+  
   const title = brandStory?.heroTitle || banner?.title || "In-nutri · 有态度的超级食物";
   const subtitle = brandStory?.heroSubtitle || banner?.subtitle || "源自真实原料";
   const description = banner?.description || brandStory?.mission || "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。";
+
+  // 判断是否为视频文件（通过扩展名或 URL 路径）
+  // 优先检查路径，因为上传的视频路径包含 /uploads/videos/
+  const isVideo = videoUrl && (
+    videoUrl.includes('/uploads/videos/') ||
+    videoUrl.endsWith('.mp4') || 
+    videoUrl.endsWith('.mov') || 
+    videoUrl.endsWith('.avi') || 
+    videoUrl.endsWith('.webm')
+  );
+
+  // 调试信息（仅在服务器端）
+  if (typeof window === "undefined") {
+    console.log("=== Hero 组件调试信息 ===");
+    console.log("Banner 原始 image 值:", banner?.image);
+    console.log("修复后的视频 URL:", videoUrl);
+    console.log("是否为视频:", isVideo);
+    console.log("是否渲染视频组件:", videoUrl && isVideo);
+  }
 
   return (
     <header className="relative isolate overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>
@@ -88,18 +131,16 @@ export async function Hero() {
         background: 'linear-gradient(135deg, #0E4F2E 0%, #1a6b3f 50%, #082317 100%)',
       }} />
       
-      {/* 视频层 - 仅在有效 URL 时显示 */}
-      {videoUrl && (
-        <video
-          className="absolute inset-0 h-full w-full object-cover z-0"
-          autoPlay
-          muted
-          loop
-          playsInline
-        >
-          <source src={videoUrl} type="video/mp4" />
-        </video>
-      )}
+      {/* 视频层 - 仅在有效 URL 且为视频文件时显示 */}
+      {videoUrl && isVideo ? (
+        <VideoBackground src={videoUrl} />
+      ) : videoUrl && !isVideo ? (
+        // 如果是图片 URL，显示为背景图片
+        <div 
+          className="absolute inset-0 h-full w-full object-cover z-[1] bg-cover bg-center"
+          style={{ backgroundImage: `url(${videoUrl})`, zIndex: 1 }}
+        />
+      ) : null}
       
       {/* 遮罩层 */}
       <div className="absolute inset-0 bg-[#082317]/50 z-10" />

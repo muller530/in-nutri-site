@@ -6,7 +6,8 @@ import { products } from "@/db/schema";
 
 import { eq } from "drizzle-orm";
 
-export const runtime = 'edge';
+// 使用 Node.js runtime，因为数据库连接在 Edge Runtime 中无法正常工作
+export const runtime = 'nodejs';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

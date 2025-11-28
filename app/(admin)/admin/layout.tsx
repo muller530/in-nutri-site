@@ -4,9 +4,15 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 
 async function getAdmin() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("in_admin_session");
-  return await parseAdminFromCookie(sessionCookie?.value);
+  try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("in_admin_session");
+    return await parseAdminFromCookie(sessionCookie?.value);
+  } catch (error) {
+    // 如果数据库连接失败，返回 null（允许访问登录页面）
+    console.error("Error getting admin:", error);
+    return null;
+  }
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

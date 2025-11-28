@@ -1,0 +1,36 @@
+# EdgeOne 部署文件清单
+
+## 必需文件/目录
+.next/
+public/
+app/
+components/
+lib/
+db/
+package.json
+package-lock.json
+next.config.js
+tsconfig.json
+drizzle.config.ts
+
+## 可选文件
+README.md
+EDGEONE_DEPLOY_COMPLETE.md
+
+## 环境变量配置
+在 EdgeOne 控制台设置以下环境变量：
+- NODE_ENV=production
+- DATABASE_URL=./db/sqlite.db
+- EDGEONE_DEPLOY=true
+- SESSION_SECRET=<生成随机字符串>
+- NEXT_PUBLIC_BASE_URL=https://your-site.edgeone.com
+
+## 构建配置
+- 构建命令: npm run build
+- 输出目录: .next
+- Node.js 版本: 18.x 或 20.x
+- 安装命令: npm install --production
+
+## 启动配置
+- 启动命令: npm start
+- 端口: 3000

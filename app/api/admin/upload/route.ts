@@ -6,7 +6,8 @@ import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
 
 import { v4 as uuidv4 } from "uuid";
 
-export const runtime = 'edge';
+// 使用 Node.js runtime，因为 requireAdmin 需要数据库连接
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {

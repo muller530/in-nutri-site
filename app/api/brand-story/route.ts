@@ -4,7 +4,8 @@ import { db } from "@/db";
 
 import { brandStory } from "@/db/schema";
 
-export const runtime = 'edge';
+// 使用 Node.js runtime，因为数据库连接在 Edge Runtime 中无法正常工作
+export const runtime = 'nodejs';
 export async function GET() {
   try {
     const story = await db.select().from(brandStory).limit(1);

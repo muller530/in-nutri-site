@@ -1,5 +1,5 @@
 "use client";
-export const runtime = 'edge';
+export const runtime = 'nodejs'; // 使用 Node.js runtime，因为需要数据库连接
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -94,6 +94,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
       const res = await fetch("/api/admin/upload", {
         method: "POST",
+        credentials: "include", // 确保发送认证 cookie
         body: uploadFormData,
       });
 

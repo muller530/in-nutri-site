@@ -14,7 +14,8 @@ import { cookies } from "next/headers";
 
 import { z } from "zod";
 
-export const runtime = 'edge';
+// 使用 Node.js runtime，因为 bcryptjs 在 Edge Runtime 中可能无法正常工作
+export const runtime = 'nodejs';
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),

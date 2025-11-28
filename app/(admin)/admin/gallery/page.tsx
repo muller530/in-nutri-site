@@ -1,5 +1,5 @@
 import Link from "next/link";
-export const runtime = 'edge';
+export const runtime = 'nodejs'; // 使用 Node.js runtime，因为需要数据库连接
 import { db } from "@/db";
 import { galleryImages } from "@/db/schema";
 import { asc } from "drizzle-orm";

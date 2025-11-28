@@ -10,7 +10,7 @@ import { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-export const runtime = 'edge';
+export const runtime = 'nodejs'; // 使用 Node.js runtime，因为数据库连接在 Edge Runtime 中无法正常工作
 const updateSiteSettingsSchema = z.object({
   douyinUrl: z.string().url().optional().or(z.literal("")),
   xiaohongshuUrl: z.string().url().optional().or(z.literal("")),

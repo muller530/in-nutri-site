@@ -102,10 +102,10 @@ export async function parseAdminFromRequest(request: NextRequest): Promise<Admin
 export async function parseAdminFromCookie(cookieValue: string | undefined): Promise<AdminUser | null> {
   if (!cookieValue) return null;
 
-  const tokenData = await verifyToken(cookieValue);
-  if (!tokenData) return null;
-
   try {
+    const tokenData = await verifyToken(cookieValue);
+    if (!tokenData) return null;
+
     const { memberId, expiresAt } = JSON.parse(tokenData);
     if (Date.now() > expiresAt) return null;
 
@@ -118,7 +118,9 @@ export async function parseAdminFromCookie(cookieValue: string | undefined): Pro
       name: member[0].name,
       role: member[0].role || "admin",
     };
-  } catch {
+  } catch (error) {
+    // 如果数据库连接失败或其他错误，返回 null（允许访问登录页面）
+    console.error("Error parsing admin from cookie:", error);
     return null;
   }
 }

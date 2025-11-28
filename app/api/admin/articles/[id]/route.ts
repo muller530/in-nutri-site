@@ -10,7 +10,7 @@ import { requireAdmin } from "@/lib/auth";
 
 import { z } from "zod";
 
-export const runtime = 'edge';
+export const runtime = 'nodejs'; // 使用 Node.js runtime，因为数据库连接在 Edge Runtime 中无法正常工作
 const updateArticleSchema = z.object({
   slug: z.string().min(1).optional(),
   title: z.string().min(1).optional(),

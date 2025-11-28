@@ -9,11 +9,13 @@
     "lint": "eslint",
     "check:local": "bash scripts/check-local.sh",
     "prepare:edgeone": "bash scripts/prepare-edgeone.sh",
+    "deploy:edgeone": "bash scripts/deploy-edgeone.sh",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/init-db.ts",
     "db:seed-data": "tsx -e \"import { seedData } from './db/seedData'; seedData().then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1); });\"",
+    "fix:banner-video": "tsx scripts/fix-banner-video.ts",
     "pages:build": "npx @cloudflare/next-on-pages",
     "db:migrate-d1": "wrangler d1 execute in-nutri-db --file=./drizzle/0000_secret_the_initiative.sql",
     "deploy:cf": "npm run pages:build && wrangler pages deploy .vercel/output/static"
@@ -46,6 +48,6 @@
     "eslint-config-next": "^15.5.2",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
-    "typescript": "^5"
+    "typescript": "5.9.3"
   }
 }

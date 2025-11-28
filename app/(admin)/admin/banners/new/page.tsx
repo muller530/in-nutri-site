@@ -7,7 +7,6 @@ export default function NewBannerPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [inputMethod, setInputMethod] = useState<"url" | "upload">("url");
   const [formData, setFormData] = useState({
     key: "",
     title: "",
@@ -27,6 +26,7 @@ export default function NewBannerPage() {
 
       const res = await fetch("/api/admin/upload-video", {
         method: "POST",
+        credentials: "include", // 确保发送认证 cookie
         body: formData,
       });
 
@@ -107,67 +107,35 @@ export default function NewBannerPage() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            首页视频/图片 URL（用于首页第一屏背景视频）
+            首页视频（用于首页第一屏背景视频）*
           </label>
-          <div className="mb-3 flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="inputMethod"
-                value="url"
-                checked={inputMethod === "url"}
-                onChange={() => setInputMethod("url")}
-                className="mr-2"
-              />
-              <span className="text-sm">输入 URL</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="inputMethod"
-                value="upload"
-                checked={inputMethod === "upload"}
-                onChange={() => setInputMethod("upload")}
-                className="mr-2"
-              />
-              <span className="text-sm">上传视频文件</span>
-            </label>
+          <div>
+            <input
+              type="file"
+              accept="video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/webm"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+              required={!formData.image}
+            />
+            {uploading && <p className="mt-2 text-sm text-blue-600">上传中...</p>}
+            {formData.image && (
+              <div className="mt-2">
+                <p className="text-sm text-green-600">✓ 视频已上传</p>
+                <p className="text-xs text-gray-500 mt-1">URL: {formData.image}</p>
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, image: "" }))}
+                  className="mt-2 text-xs text-red-600 hover:text-red-800 underline"
+                >
+                  删除视频，重新上传
+                </button>
+              </div>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              支持格式：MP4、MOV、AVI、WEBM。最大文件大小：100MB。
+            </p>
           </div>
-
-          {inputMethod === "url" ? (
-            <div>
-              <input
-                type="text"
-                value={formData.image}
-                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                placeholder="输入视频或图片 URL（例如：https://example.com/video.mp4 或 /uploads/videos/video.mp4）"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                支持视频格式：MP4、MOV、AVI、WEBM。如果输入图片 URL，将显示为静态背景。
-              </p>
-            </div>
-          ) : (
-            <div>
-              <input
-                type="file"
-                accept="video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/webm"
-                onChange={handleFileChange}
-                disabled={uploading}
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              />
-              {uploading && <p className="mt-2 text-sm text-blue-600">上传中...</p>}
-              {formData.image && (
-                <div className="mt-2">
-                  <p className="text-sm text-green-600">✓ 视频已上传</p>
-                  <p className="text-xs text-gray-500 mt-1">URL: {formData.image}</p>
-                </div>
-              )}
-              <p className="mt-1 text-xs text-gray-500">
-                支持格式：MP4、MOV、AVI、WEBM。最大文件大小：100MB。
-              </p>
-            </div>
-          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">链接 URL</label>

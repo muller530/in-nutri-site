@@ -1,5 +1,5 @@
 import { db } from "@/db";
-export const runtime = 'edge';
+export const runtime = 'nodejs'; // 使用 Node.js runtime，因为需要数据库连接
 import { products, articles, recipes, banners, videos, galleryImages } from "@/db/schema";
 
 async function getStats() {

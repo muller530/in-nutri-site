@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import { db } from "@/db";
 import { members } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import crypto from "crypto";
 
 const SESSION_SECRET = process.env.SESSION_SECRET || "in-nutri-admin-secret-key-change-in-production";
 const SESSION_COOKIE_NAME = "in_admin_session";
@@ -15,21 +14,55 @@ export interface AdminUser {
   role: string;
 }
 
-function signToken(data: string): string {
-  const hmac = crypto.createHmac("sha256", SESSION_SECRET);
-  hmac.update(data);
-  return `${data}.${hmac.digest("hex")}`;
+// 使用 Web Crypto API（Edge Runtime 兼容）
+async function signToken(data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(SESSION_SECRET);
+  const messageData = encoder.encode(data);
+  
+  // 导入密钥
+  const key = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  
+  // 签名
+  const signature = await crypto.subtle.sign("HMAC", key, messageData);
+  const signatureHex = Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+  
+  return `${data}.${signatureHex}`;
 }
 
-function verifyToken(token: string): string | null {
+async function verifyToken(token: string): Promise<string | null> {
   const [data, signature] = token.split(".");
   if (!data || !signature) return null;
 
-  const hmac = crypto.createHmac("sha256", SESSION_SECRET);
-  hmac.update(data);
-  const expectedSignature = hmac.digest("hex");
-
-  if (signature !== expectedSignature) return null;
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(SESSION_SECRET);
+  const messageData = encoder.encode(data);
+  
+  // 导入密钥
+  const key = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["verify"]
+  );
+  
+  // 验证签名
+  const signatureBytes = new Uint8Array(
+    signature.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || []
+  );
+  
+  const isValid = await crypto.subtle.verify("HMAC", key, signatureBytes, messageData);
+  
+  if (!isValid) return null;
   return data;
 }
 
@@ -38,14 +71,14 @@ export async function createSession(memberId: number): Promise<string> {
     memberId,
     expiresAt: Date.now() + SESSION_DURATION,
   });
-  return signToken(tokenData);
+  return await signToken(tokenData);
 }
 
 export async function parseAdminFromRequest(request: NextRequest): Promise<AdminUser | null> {
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
   if (!sessionCookie?.value) return null;
 
-  const tokenData = verifyToken(sessionCookie.value);
+  const tokenData = await verifyToken(sessionCookie.value);
   if (!tokenData) return null;
 
   try {
@@ -69,7 +102,7 @@ export async function parseAdminFromRequest(request: NextRequest): Promise<Admin
 export async function parseAdminFromCookie(cookieValue: string | undefined): Promise<AdminUser | null> {
   if (!cookieValue) return null;
 
-  const tokenData = verifyToken(cookieValue);
+  const tokenData = await verifyToken(cookieValue);
   if (!tokenData) return null;
 
   try {

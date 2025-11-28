@@ -14,10 +14,39 @@ export async function GET() {
       .from(banners)
       .where(eq(banners.isActive, true))
       .orderBy(asc(banners.position));
+    // 如果数据库返回空数组，返回默认数据
+    if (allBanners.length === 0) {
+      return NextResponse.json({ 
+        data: [{
+          key: "home-hero",
+          title: "In-nutri · 有态度的超级食物",
+          subtitle: "源自真实原料",
+          description: "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。",
+          image: "",
+          linkUrl: "#products",
+          position: 0,
+          isActive: true,
+        }], 
+        error: null 
+      });
+    }
     return NextResponse.json({ data: allBanners, error: null });
   } catch (error) {
     console.error("Error fetching banners:", error);
-    return NextResponse.json({ data: null, error: "Failed to fetch banners" }, { status: 500 });
+    // 即使出错，也返回默认数据，确保页面能正常显示
+    return NextResponse.json({ 
+      data: [{
+        key: "home-hero",
+        title: "In-nutri · 有态度的超级食物",
+        subtitle: "源自真实原料",
+        description: "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。",
+        image: "",
+        linkUrl: "#products",
+        position: 0,
+        isActive: true,
+      }], 
+      error: null 
+    });
   }
 }
 

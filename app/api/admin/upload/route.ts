@@ -59,15 +59,20 @@ export async function POST(request: NextRequest) {
       fileUrl = await uploadToR2(bucket, file, filePath);
     } else {
       // 使用本地文件系统（仅在 Node.js 环境下）
-      const { writeFile, mkdir } = await import("fs/promises");
-      const { join } = await import("path");
-      const { existsSync } = await import("fs");
+      // 使用 Function 构造函数避免静态分析
+      const loadFsPromises = new Function('return import("fs/promises")');
+      const loadPath = new Function('return import("path")');
+      const loadFs = new Function('return import("fs")');
       
-      const uploadDir = join(process.cwd(), "public", "uploads", "products");
-      if (!existsSync(uploadDir)) {
+      const { writeFile, mkdir } = await loadFsPromises();
+      const path = await loadPath();
+      const fs = await loadFs();
+      
+      const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
+      if (!fs.existsSync(uploadDir)) {
         await mkdir(uploadDir, { recursive: true });
       }
-      const localFilePath = join(uploadDir, fileName);
+      const localFilePath = path.join(uploadDir, fileName);
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
       await writeFile(localFilePath, buffer);

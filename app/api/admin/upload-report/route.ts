@@ -53,8 +53,12 @@ export async function POST(request: NextRequest) {
       fileUrl = await uploadToR2(bucket, file, filePath);
     } else {
       // 使用本地文件系统（仅在 Node.js 环境下）
-      const { writeFile, mkdir } = await import("fs/promises");
-      const path = await import("path");
+      // 使用 Function 构造函数避免静态分析
+      const loadFsPromises = new Function('return import("fs/promises")');
+      const loadPath = new Function('return import("path")');
+      
+      const { writeFile, mkdir } = await loadFsPromises();
+      const path = await loadPath();
       
       const uploadDir = path.join(process.cwd(), "public", "uploads", "reports");
       await mkdir(uploadDir, { recursive: true });

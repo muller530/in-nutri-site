@@ -1,12 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { X } from "lucide-react";
 
-// 动态导入 QRCodeSVG 以避免重复加载
+// 使用动态导入并确保只加载一次
+// 使用 loading 属性来避免重复渲染
 const QRCodeSVG = dynamic(
   () => import("qrcode.react").then((mod) => mod.QRCodeSVG),
-  { ssr: false }
+  { 
+    ssr: false,
+    loading: () => <div className="h-[200px] w-[200px] animate-pulse bg-gray-200 rounded-lg" />,
+  }
 );
 
 interface QRCodeModalProps {

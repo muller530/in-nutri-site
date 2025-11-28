@@ -5,14 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "pages:build": "npx @cloudflare/next-on-pages",
     "start": "next start",
     "lint": "eslint",
+    "check:local": "bash scripts/check-local.sh",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/init-db.ts",
     "db:seed-data": "tsx -e \"import { seedData } from './db/seedData'; seedData().then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1); });\"",
+    "pages:build": "npx @cloudflare/next-on-pages",
     "db:migrate-d1": "wrangler d1 execute in-nutri-db --file=./drizzle/0000_secret_the_initiative.sql",
     "deploy:cf": "npm run pages:build && wrangler pages deploy .vercel/output/static"
   },

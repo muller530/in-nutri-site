@@ -1,7 +1,13 @@
 "use client";
 
-import { QRCodeSVG } from "qrcode.react";
+import dynamic from "next/dynamic";
 import { X } from "lucide-react";
+
+// 动态导入 QRCodeSVG 以避免重复加载
+const QRCodeSVG = dynamic(
+  () => import("qrcode.react").then((mod) => mod.QRCodeSVG),
+  { ssr: false }
+);
 
 interface QRCodeModalProps {
   url: string;

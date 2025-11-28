@@ -93,11 +93,6 @@ export async function Hero() {
             alt="In Nutri 标志" 
             priority 
             className="drop-shadow-lg"
-            onError={(e) => {
-              console.error("Logo image failed to load");
-              // 如果图片加载失败，隐藏图片元素
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
           />
         </div>
         <div className="space-y-6 max-w-3xl">

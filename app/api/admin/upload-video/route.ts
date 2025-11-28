@@ -2,12 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { requireAdmin } from "@/lib/auth";
 
-// 注意：此路由必须使用 Node.js Runtime，因为需要使用文件系统
-export const runtime = 'nodejs';
-import { writeFile, mkdir } from "fs/promises";
-
-import path from "path";
-
 import { v4 as uuidv4 } from "uuid";
 
 import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
@@ -47,7 +41,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const fileExtension = path.extname(file.name) || ".mp4";
+    // 获取文件扩展名（在 Cloudflare 和本地都可用）
+    const fileName = file.name;
+    const fileExtension = fileName.includes(".") 
+      ? "." + fileName.split(".").pop() 
+      : ".mp4";
     const uniqueFileName = `${uuidv4()}${fileExtension}`;
     const filePath = `videos/${uniqueFileName}`;
 
@@ -65,7 +63,10 @@ export async function POST(request: NextRequest) {
       }
       fileUrl = await uploadToR2(bucket, file, filePath);
     } else {
-      // 使用本地文件系统
+      // 使用本地文件系统（仅在 Node.js 环境下）
+      const { writeFile, mkdir } = await import("fs/promises");
+      const path = await import("path");
+      
       const uploadDir = path.join(process.cwd(), "public", "uploads", "videos");
       await mkdir(uploadDir, { recursive: true });
       const buffer = Buffer.from(await file.arrayBuffer());

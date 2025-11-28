@@ -2,14 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { requireAdmin } from "@/lib/auth";
 
-// 注意：此路由必须使用 Node.js Runtime，因为需要使用文件系统
-export const runtime = 'nodejs';
-import { writeFile, mkdir } from "fs/promises";
-
-import { join } from "path";
-
-import { existsSync } from "fs";
-
 import { getR2Bucket, isCloudflare, uploadToR2 } from "@/lib/r2";
 
 import { v4 as uuidv4 } from "uuid";
@@ -64,7 +56,11 @@ export async function POST(request: NextRequest) {
       }
       fileUrl = await uploadToR2(bucket, file, filePath);
     } else {
-      // 使用本地文件系统
+      // 使用本地文件系统（仅在 Node.js 环境下）
+      const { writeFile, mkdir } = await import("fs/promises");
+      const { join } = await import("path");
+      const { existsSync } = await import("fs");
+      
       const uploadDir = join(process.cwd(), "public", "uploads", "products");
       if (!existsSync(uploadDir)) {
         await mkdir(uploadDir, { recursive: true });

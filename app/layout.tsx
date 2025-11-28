@@ -34,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${inter.variable} antialiased bg-[var(--color-cream)]`}>
+      <body className={`${inter.variable} antialiased`} style={{ margin: 0, padding: 0 }}>
         {children}
       </body>
     </html>

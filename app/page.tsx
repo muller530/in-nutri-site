@@ -33,7 +33,7 @@ export default async function Home() {
           <SectionHeading
             eyebrow="SIGNATURE SERVICE"
             title="不仅是产品，更是可执行的超级食物日程"
-            description="In-nutri 团队持续迭代冲泡方式、数据追踪工具与生活方式指南，让"坚持"更轻松。"
+            description="In-nutri 团队持续迭代冲泡方式、数据追踪工具与生活方式指南，让&quot;坚持&quot;更轻松。"
           />
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {services.map((service) => (

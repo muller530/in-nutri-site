@@ -119,20 +119,6 @@ export async function Hero() {
             priority 
             className="drop-shadow-lg"
             unoptimized={process.env.NODE_ENV === 'production'}
-            onError={(e) => {
-              console.error("Logo 加载失败:", e);
-              // 如果 Image 组件失败，尝试使用普通 img 标签
-              const target = e.target as HTMLImageElement;
-              if (target) {
-                const img = document.createElement('img');
-                img.src = '/logo.png';
-                img.alt = 'In Nutri 标志';
-                img.className = 'drop-shadow-lg';
-                img.style.width = '260px';
-                img.style.height = 'auto';
-                target.parentNode?.replaceChild(img, target);
-              }
-            }}
           />
         </div>
         <div className="space-y-6 max-w-3xl">

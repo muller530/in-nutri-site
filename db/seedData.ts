@@ -77,7 +77,7 @@ export async function seedData() {
         title: "In-nutri · 有态度的超级食物",
         subtitle: "源自真实原料",
         description: "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。",
-        image: "video.mp4",
+        image: "",
         linkUrl: "#products",
         position: 0,
         isActive: true,

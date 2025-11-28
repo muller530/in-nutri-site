@@ -39,23 +39,32 @@ export async function Hero() {
   const banner = await getBanner();
   const brandStory = await getBrandStory();
 
-  const videoUrl = banner?.image || "video.mp4";
+  const videoUrl = banner?.image || "";
   const title = brandStory?.heroTitle || banner?.title || "In-nutri · 有态度的超级食物";
   const subtitle = brandStory?.heroSubtitle || banner?.subtitle || "源自真实原料";
   const description = banner?.description || brandStory?.mission || "我们用看得见的原料，而不是听起来很厉害的噱头。让自然成分在城市生活中重新被看见。";
 
   return (
     <header className="relative isolate overflow-hidden text-white">
-      <video
-        className="absolute inset-0 h-full w-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-        poster="https://images.unsplash.com/photo-1516826435551-36f4e65f2230?auto=format&fit=crop&w=1600&q=80"
-      >
-        <source src={videoUrl} type="video/mp4" />
-      </video>
+      {videoUrl ? (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="https://images.unsplash.com/photo-1516826435551-36f4e65f2230?auto=format&fit=crop&w=1600&q=80"
+        >
+          <source src={videoUrl} type="video/mp4" />
+        </video>
+      ) : (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url(https://images.unsplash.com/photo-1516826435551-36f4e65f2230?auto=format&fit=crop&w=1600&q=80)",
+          }}
+        />
+      )}
       <div className="absolute inset-0 bg-[#082317]/70" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#2fb54a33,transparent_50%),radial-gradient(circle_at_80%_20%,#e7f6ec44,transparent_60%)]" />
       <div className="absolute left-1/2 top-10 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#2fb54a22] blur-[160px]" />

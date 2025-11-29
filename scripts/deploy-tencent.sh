@@ -31,9 +31,22 @@ NODE_ENV=production
 DATABASE_URL=./db/sqlite.db
 NEXT_PUBLIC_BASE_URL=https://your-domain.com
 SESSION_SECRET=$(openssl rand -hex 32)
+
+# 火山引擎AI配置（可选）
+# AI_PROVIDER=volcano
+# AI_API_KEY=your-volcano-api-key
+# VOLCANO_ENDPOINT=https://ark.cn-beijing.volces.com/api/v3/chat/completions
+# VOLCANO_MODEL=doubao-pro-4k
 EOF
     echo "✅ 已创建 .env.production，请编辑后重新运行"
+    echo "📝 请设置 NEXT_PUBLIC_BASE_URL 为您的实际域名"
+    echo "📝 如需使用AI聊天功能，请配置火山引擎相关参数"
     exit 1
+fi
+
+# 检查关键环境变量
+if grep -q "your-domain.com" .env.production; then
+    echo "⚠️  警告: NEXT_PUBLIC_BASE_URL 仍为示例值，请修改为实际域名"
 fi
 
 # 构建项目

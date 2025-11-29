@@ -34,7 +34,7 @@ export async function SiteFooter() {
             width={180} 
             height={56} 
             alt="In Nutri 标志"
-            unoptimized={process.env.NODE_ENV === 'production'}
+            unoptimized={true}
           />
           <p className="text-2xl font-semibold">有态度的超级食物</p>
           <p className="text-sm text-white/70">

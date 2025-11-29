@@ -82,3 +82,5 @@ npx drizzle-kit push --driver=d1 --schema=./db/schema.ts
 - 免费账户有使用限制，但通常足够开发和小型项目使用
 - 数据库绑定后，代码会自动使用 D1，而不是本地 SQLite
 
+
+

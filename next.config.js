@@ -7,9 +7,9 @@ const nextConfig = {
         hostname: "images.unsplash.com",
       },
     ],
-    // EdgeOne 部署时，可能需要禁用图片优化或使用 unoptimized
-    // 如果 logo 不显示，可以尝试设置 unoptimized: true
-    unoptimized: process.env.NODE_ENV === 'production' && process.env.EDGEONE_DEPLOY === 'true',
+    // EdgeOne 部署时，禁用图片优化，直接使用原始图片
+    // 这样可以避免图片路径问题
+    unoptimized: process.env.NODE_ENV === 'production',
   },
   // Cloudflare Pages 适配
   // 使用 @cloudflare/next-on-pages 适配器

@@ -77,6 +77,7 @@ export async function LifestyleGrid() {
               <div className="relative h-60 w-full overflow-hidden">
                 <Image
                   src={scenario.image}
+                  unoptimized={true}
                   alt={scenario.title}
                   fill
                   className="object-cover transition duration-700 group-hover:scale-105"

@@ -171,7 +171,7 @@ export async function Hero() {
             alt="In Nutri 标志" 
             priority 
             className="drop-shadow-lg"
-            unoptimized={process.env.NODE_ENV === 'production'}
+            unoptimized={true}
           />
         </div>
         <div className="space-y-6 max-w-3xl">

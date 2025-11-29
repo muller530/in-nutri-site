@@ -36,6 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
             width={300}
             height={400}
             className="h-full w-full max-h-[320px] object-contain transition duration-500 group-hover:scale-105 relative z-10"
+            unoptimized={true}
           />
         </div>
         {product.badge && (

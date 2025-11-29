@@ -150,3 +150,5 @@ EDGEONE_DEPLOY=true
 2. Network 标签中 logo.png 的请求状态
 3. 直接访问 `https://your-site.edgeone.com/logo.png` 的结果
 
+
+

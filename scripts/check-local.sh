@@ -65,3 +65,5 @@ echo "   1. 运行 'npm run dev' 启动开发服务器"
 echo "   2. 访问 http://localhost:3000 查看预览"
 echo "   3. 检查所有功能是否正常"
 
+
+

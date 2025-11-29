@@ -26,3 +26,5 @@ bucket_name = "in-nutri-reports"
 [env.production]
 vars = { NODE_ENV = "production" }
 
+
+

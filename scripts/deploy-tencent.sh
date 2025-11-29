@@ -62,3 +62,5 @@ echo "📊 查看状态: pm2 status"
 echo "📝 查看日志: pm2 logs in-nutri-site"
 echo "🔄 重启应用: pm2 restart in-nutri-site"
 
+
+

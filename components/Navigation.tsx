@@ -597,7 +597,7 @@ export function Navigation({
                         {brandStory.heroTitle || "In Nutri"}
                       </h4>
                       <p className="text-sm text-gray-600 leading-relaxed">
-                        {brandStory.mission || parseStoryBlocks(brandStory.storyBlocks) || "我们只做一件事：把\"超级食物\"还原成看得见的好原料。"}
+                        {brandStory.mission || parseStoryBlocks(brandStory.storyBlocks || null) || "我们只做一件事：把\"超级食物\"还原成看得见的好原料。"}
                       </p>
                       <Link
                         href="/#philosophy"

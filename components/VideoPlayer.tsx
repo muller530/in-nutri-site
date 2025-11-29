@@ -81,7 +81,7 @@ export function VideoPlayer({ src, className = "", productImage, productName, pr
   }
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative z-0 h-full w-full">
       <video
         ref={videoRef}
         className={className}

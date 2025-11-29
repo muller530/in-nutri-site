@@ -57,13 +57,13 @@ export function VideoBackground({ src }: VideoBackgroundProps) {
   return (
     <video
       ref={videoRef}
-      className="absolute inset-0 h-full w-full object-cover z-[1]"
+      className="absolute inset-0 h-full w-full object-cover z-0"
       autoPlay
       muted
       loop
       playsInline
       preload="auto"
-      style={{ zIndex: 1 }}
+      style={{ zIndex: 0 }}
       key={src} // 添加 key 确保 URL 变化时重新加载
     >
       <source src={src} type="video/mp4" />

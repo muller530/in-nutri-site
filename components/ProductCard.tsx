@@ -14,7 +14,7 @@ export type Product = {
 
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <article className="group flex flex-col rounded-3xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:shadow-xl overflow-hidden h-full">
+    <article className="group relative z-0 flex flex-col rounded-3xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:shadow-xl overflow-hidden h-full">
       {/* 产品图片区域 - 占据较大空间，类似参考图片的比例 */}
       <div className="relative flex-1 min-h-[280px] overflow-hidden bg-gradient-to-b from-gray-50 to-white px-6 pt-8 pb-4">
         {/* 背景图片 - 鼠标悬停时显示 */}
@@ -23,6 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
             src="/in.png"
             alt=""
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
             style={{ objectFit: 'cover' }}
           />

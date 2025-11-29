@@ -2,6 +2,7 @@ import { BrandStory } from "@/components/BrandStory";
 import { CreatorsSpotlight } from "@/components/CreatorsSpotlight";
 import { Hero } from "@/components/Hero";
 import { LifestyleGrid } from "@/components/LifestyleGrid";
+import { NavigationServer } from "@/components/NavigationServer";
 import { ProductShowcase } from "@/components/ProductShowcase";
 import { ScienceHighlights } from "@/components/ScienceHighlights";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -27,11 +28,13 @@ const services = [
 
 export default async function Home() {
   return (
-    <div className="bg-[var(--color-cream)] text-[var(--color-forest)]">
+    <div className="relative z-0 bg-[var(--color-cream)] text-[var(--color-forest)]">
+      {/* 导航栏 - 移到页面级别，确保在最上层 */}
+      <NavigationServer />
       <Hero />
       <BrandStory />
 
-      <section className="bg-white">
+      <section className="relative z-0 bg-white">
         <div className="page-shell py-24">
           <SectionHeading
             eyebrow="SIGNATURE SERVICE"
@@ -57,7 +60,7 @@ export default async function Home() {
       <LifestyleGrid />
       <CreatorsSpotlight />
 
-      <section className="bg-[var(--color-mint)]">
+      <section className="relative z-0 bg-[var(--color-mint)]">
         <div className="page-shell flex flex-col items-center gap-6 py-20 text-center">
           <p className="text-xs uppercase tracking-[0.4em] text-[var(--color-primary)]">BOOK A TASTING</p>
           <h3 className="text-3xl font-light text-[var(--color-forest)] sm:text-4xl">

@@ -93,7 +93,7 @@ export async function CreatorsSpotlight() {
     : defaultVideos.map((v) => ({ ...v, cover: "", productImage: null, productName: null, productPurchaseUrl: null }));
 
   return (
-    <section className="bg-[var(--color-cream)]">
+    <section className="relative z-0 bg-[var(--color-cream)]">
       <div className="page-shell py-24">
         <div className="flex flex-col gap-4 text-center">
           <p className="text-xs uppercase tracking-[0.4em] text-[var(--color-primary)]">CREATOR STORIES</p>

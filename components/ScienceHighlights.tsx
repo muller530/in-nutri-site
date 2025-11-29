@@ -23,7 +23,7 @@ const highlights = [
 
 export function ScienceHighlights() {
   return (
-    <section id="science" className="bg-[var(--color-forest)] text-[var(--color-cream)]">
+    <section id="science" className="relative z-0 bg-[var(--color-forest)] text-[var(--color-cream)]">
       <div className="page-shell py-20">
         <div className="flex flex-col gap-4 text-center">
           <p className="text-xs uppercase tracking-[0.4em] text-[var(--color-primary)]/90">SCIENCE BACKED</p>

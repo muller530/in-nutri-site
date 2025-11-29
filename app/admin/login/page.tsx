@@ -29,8 +29,22 @@ export default function AdminLoginPage() {
         router.push("/admin");
         router.refresh();
       } else {
-        // 显示具体错误信息
-        const errorMessage = data.error || `登录失败 (HTTP ${res.status})`;
+        // 显示具体错误信息，提供更友好的提示
+        let errorMessage = data.error || `登录失败 (HTTP ${res.status})`;
+        
+        // 根据错误类型提供更详细的提示
+        if (errorMessage.includes("数据库连接失败")) {
+          errorMessage = "数据库连接失败。请检查：\n1. 数据库文件是否存在\n2. 数据库文件权限是否正确\n3. 环境变量配置是否正确";
+        } else if (errorMessage.includes("EdgeOne")) {
+          errorMessage = "EdgeOne 环境不支持 SQLite。请配置云数据库（MySQL/PostgreSQL）或使用腾讯云服务器部署。";
+        } else if (errorMessage.includes("邮箱或密码错误")) {
+          errorMessage = "邮箱或密码错误。默认管理员账号：\n邮箱: admin@in-nutri.com\n密码: inNutriAdmin123";
+        } else if (errorMessage.includes("账户已被禁用")) {
+          errorMessage = "账户已被禁用，请联系系统管理员。";
+        } else if (errorMessage.includes("创建会话失败")) {
+          errorMessage = "创建会话失败。请检查 SESSION_SECRET 环境变量是否正确配置。";
+        }
+        
         setError(errorMessage);
         console.error("登录失败:", {
           status: res.status,
@@ -51,7 +65,11 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-2xl font-bold text-gray-800">In-nutri 管理后台登录</h1>
-        {error && <div className="mb-4 rounded bg-red-100 p-3 text-sm text-red-700">{error}</div>}
+        {error && (
+          <div className="mb-4 rounded bg-red-100 p-3 text-sm text-red-700 whitespace-pre-line">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="mb-2 block text-sm font-medium text-gray-700">邮箱</label>

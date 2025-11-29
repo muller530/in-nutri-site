@@ -12,6 +12,14 @@ async function initDb() {
     await seedAdmin();
     console.log("管理员账户导入完成。\n");
 
+    console.log("导入站点设置...");
+    execSync("npm run db:seed-site-settings", { stdio: "inherit" });
+    console.log("站点设置导入完成。\n");
+
+    console.log("导入导航栏数据...");
+    execSync("npm run db:seed-navigation", { stdio: "inherit" });
+    console.log("导航栏数据导入完成。\n");
+
     console.log("导入前台数据...");
     await seedData();
     console.log("前台数据导入完成。\n");

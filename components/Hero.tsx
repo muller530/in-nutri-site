@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroClient } from "./HeroClient";
 import { VideoBackground } from "./VideoBackground";
-import { Navigation } from "./Navigation";
+import { NavigationServer } from "./NavigationServer";
 import { getApiUrl, isBuildTime } from "@/lib/api";
 
 async function getBanner() {
@@ -138,10 +138,7 @@ export async function Hero() {
   console.log("Banner 完整数据:", JSON.stringify(banner, null, 2));
 
   return (
-    <header className="relative isolate overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>
-      {/* 导航栏 */}
-      <Navigation />
-      
+    <header className="relative z-0 overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>
       {/* 背景层 - 使用纯 CSS，不依赖外部资源 */}
       <div className="absolute inset-0 z-0" style={{
         background: 'linear-gradient(135deg, #0E4F2E 0%, #1a6b3f 50%, #082317 100%)',
@@ -153,20 +150,20 @@ export async function Hero() {
       ) : videoUrl && !isVideo ? (
         // 如果是图片 URL，显示为背景图片
         <div 
-          className="absolute inset-0 h-full w-full object-cover z-[1] bg-cover bg-center"
-          style={{ backgroundImage: `url(${videoUrl})`, zIndex: 1 }}
+          className="absolute inset-0 h-full w-full object-cover z-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${videoUrl})` }}
         />
       ) : null}
       
       {/* 遮罩层 */}
-      <div className="absolute inset-0 bg-[#082317]/50 z-10" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#2fb54a33,transparent_50%),radial-gradient(circle_at_80%_20%,#e7f6ec44,transparent_60%)] z-20" />
-      <div className="absolute left-1/2 top-10 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#2fb54a22] blur-[160px] z-20" />
-      <div className="absolute inset-0 opacity-40 z-20">
+      <div className="absolute inset-0 bg-[#082317]/50 z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#2fb54a33,transparent_50%),radial-gradient(circle_at_80%_20%,#e7f6ec44,transparent_60%)] z-0" />
+      <div className="absolute left-1/2 top-10 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#2fb54a22] blur-[160px] z-0" />
+      <div className="absolute inset-0 opacity-40 z-0">
         <div className="particle pointer-events-none absolute left-6 top-10 h-24 w-24 rounded-full border border-white/10" />
       </div>
 
-      <div className="page-shell relative z-30 flex min-h-screen flex-col items-center justify-center gap-10 py-24 text-center" style={{ paddingTop: '120px' }}>
+      <div className="page-shell relative z-0 flex min-h-screen flex-col items-center justify-end gap-10 py-24 text-center" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
         <div className="space-y-6 max-w-3xl">
           <h1 className="text-4xl font-light leading-tight tracking-wide sm:text-5xl lg:text-6xl">
             {title}

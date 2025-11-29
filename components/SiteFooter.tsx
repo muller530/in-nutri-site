@@ -58,14 +58,9 @@ export async function SiteFooter() {
               联系我们
             </a>
           </div>
-          <div className="flex flex-col gap-4">
-            {/* 社交媒体图标 */}
-            <SocialIcons
-              douyinUrl={settings?.douyinUrl}
-              xiaohongshuUrl={settings?.xiaohongshuUrl}
-              tmallUrl={settings?.tmallUrl}
-              jdUrl={settings?.jdUrl}
-            />
+          <div className="flex flex-col gap-6">
+            {/* 社交媒体图标 - 参考 KOS.com 的 follow 板块设计 */}
+            <SocialIcons />
             {/* 质检报告 */}
             {settings?.qualityReportUrl && (
               <Link

@@ -104,20 +104,20 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* 聊天按钮 */}
+      {/* 聊天按钮 - 在导航栏下方 */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-white shadow-lg transition-all hover:scale-110 hover:shadow-xl"
+          className="fixed bottom-6 right-6 z-[70] flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-white shadow-lg transition-all hover:scale-110 hover:shadow-xl"
           aria-label="打开聊天"
         >
           <MessageCircle className="h-6 w-6" />
         </button>
       )}
 
-      {/* 聊天窗口 */}
+      {/* 聊天窗口 - 在导航栏下方 */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[600px] w-[400px] flex-col rounded-2xl bg-white shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-[70] flex h-[600px] w-[400px] flex-col rounded-2xl bg-white shadow-2xl">
           {/* 头部 */}
           <div className="flex items-center justify-between rounded-t-2xl bg-[var(--color-primary)] px-4 py-3">
             <div className="flex items-center gap-2">

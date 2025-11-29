@@ -7,10 +7,13 @@ async function seedNavigation() {
     const existing = await db.select().from(navigationItems).limit(1);
     if (existing.length > 0) {
       console.log("导航项已存在，跳过种子数据。");
+      console.log("如需重置，请先删除现有导航项或使用 --force 参数（如果支持）。");
       return;
     }
 
-    // 创建默认导航项（参考图片样式）
+    // 创建默认导航项（根据截图预设）
+    // 左侧导航：产品相关
+    // 右侧导航：服务和联系
     const defaultItems = [
       // 左侧导航
       {
@@ -57,6 +60,7 @@ async function seedNavigation() {
     console.log("✅ 默认导航项已创建:");
     console.log("   左侧: Shop All, Rewards");
     console.log("   右侧: Store Locator, Contact");
+    console.log("\n💡 提示：您可以在后台管理页面 /admin/navigation 修改这些导航项");
   } catch (error) {
     console.error("创建导航项失败:", error);
     throw error;

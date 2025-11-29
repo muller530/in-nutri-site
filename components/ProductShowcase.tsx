@@ -62,7 +62,7 @@ export async function ProductShowcase() {
   ];
 
   return (
-    <section id="products" className="bg-[var(--color-mint)]/40">
+    <section id="products" className="relative z-0 bg-[var(--color-mint)]/40">
       <div className="page-shell py-24">
         <SectionHeading
           eyebrow="SUPERFOOD COLLECTION"

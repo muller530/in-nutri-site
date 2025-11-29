@@ -119,9 +119,34 @@ npm run db:reset-admin
 - **邮箱**: `admin@in-nutri.com`
 - **密码**: `inNutriAdmin123`
 
+## 🔍 诊断工具
+
+在修复之前，可以先运行诊断脚本检查问题：
+
+```bash
+# SSH 到服务器
+ssh root@your-server-ip
+cd /var/www/in-nutri-site
+
+# 运行诊断脚本
+npm run diagnose:login
+
+# 或直接运行
+chmod +x scripts/diagnose-login.sh
+./scripts/diagnose-login.sh
+```
+
+诊断脚本会检查：
+- ✅ 数据库文件是否存在及权限
+- ✅ 环境变量配置
+- ✅ 数据库连接状态
+- ✅ 管理员账号是否存在
+- ✅ 应用运行状态
+- ✅ Node.js 和依赖安装情况
+
 ## 🔧 快速修复脚本
 
-创建一个快速修复脚本 `fix-production-login.sh`：
+已创建快速修复脚本 `fix-production-login.sh`：
 
 ```bash
 #!/bin/bash
@@ -274,10 +299,29 @@ npm run db:seed
 
 修复后，请验证：
 
-1. ✅ 数据库文件存在且可访问
-2. ✅ 管理员账号已创建
-3. ✅ 应用可以正常启动
-4. ✅ 登录页面可以访问
-5. ✅ 使用管理员账号可以成功登录
-6. ✅ 登录后可以访问后台管理页面
+1. ✅ 运行诊断脚本：`npm run diagnose:login`
+2. ✅ 数据库文件存在且可访问
+3. ✅ 管理员账号已创建
+4. ✅ 应用可以正常启动
+5. ✅ 登录页面可以访问
+6. ✅ 使用管理员账号可以成功登录
+7. ✅ 登录后可以访问后台管理页面
+
+## 📝 新增功能
+
+### 诊断脚本 (`scripts/diagnose-login.sh`)
+
+新增的诊断脚本可以全面检查生产环境的登录相关问题：
+
+```bash
+npm run diagnose:login
+```
+
+### 改进的登录页面错误提示
+
+登录页面现在会显示更详细和友好的错误信息：
+- 数据库连接失败时会提供具体的检查步骤
+- EdgeOne 环境错误会提示解决方案
+- 密码错误时会显示默认管理员账号信息
+- 其他错误也会提供相应的解决建议
 

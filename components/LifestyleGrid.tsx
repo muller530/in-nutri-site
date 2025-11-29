@@ -56,7 +56,7 @@ export async function LifestyleGrid() {
     : defaultScenarios;
 
   return (
-    <section className="bg-white">
+    <section className="relative z-0 bg-white">
       <div className="page-shell py-24">
         <div className="flex flex-col gap-4 text-center">
           <p className="text-xs uppercase tracking-[0.4em] text-[var(--color-primary)]">LIFESTYLE</p>

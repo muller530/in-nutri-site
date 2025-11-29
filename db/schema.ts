@@ -165,6 +165,21 @@ export const navigationItems = sqliteTable("navigation_items", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
+// 13. Social Media Platforms (社交媒体平台)
+export const socialPlatforms = sqliteTable("social_platforms", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(), // 平台名称，如 "Facebook", "Instagram"
+  iconType: text("icon_type").default("svg"), // "svg" | "image" | "emoji"
+  iconSvg: text("icon_svg"), // SVG代码
+  iconImage: text("icon_image"), // 图片URL
+  iconEmoji: text("icon_emoji"), // Emoji字符
+  url: text("url"), // 平台链接
+  sortOrder: integer("sort_order").default(0), // 排序顺序
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
 // TypeScript types
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
@@ -201,3 +216,6 @@ export type NewSubscriber = typeof subscribers.$inferInsert;
 
 export type NavigationItem = typeof navigationItems.$inferSelect;
 export type NewNavigationItem = typeof navigationItems.$inferInsert;
+
+export type SocialPlatform = typeof socialPlatforms.$inferSelect;
+export type NewSocialPlatform = typeof socialPlatforms.$inferInsert;

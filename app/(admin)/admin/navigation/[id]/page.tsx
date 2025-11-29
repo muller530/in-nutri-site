@@ -8,6 +8,7 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
   const [id, setId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [parentMenus, setParentMenus] = useState<Array<{ id: number; label: string; type: string }>>([]);
   const [formData, setFormData] = useState({
     label: "",
     url: "",
@@ -20,6 +21,46 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
     isActive: true,
     openInNewTab: false,
   });
+
+  // 加载父菜单列表（只显示 dropdown 类型的一级菜单，排除当前编辑的菜单）
+  useEffect(() => {
+    async function loadParentMenus() {
+      try {
+        const res = await fetch("/api/admin/navigation");
+        const data = await res.json();
+        if (data.data) {
+          // 只显示类型为 dropdown 且没有父菜单的一级菜单，排除当前编辑的菜单
+          const dropdownMenus = data.data.filter(
+            (item: any) => item.type === "dropdown" && !item.parentId && item.id !== parseInt(id)
+          );
+          setParentMenus(dropdownMenus);
+        }
+      } catch (error) {
+        console.error("Failed to load parent menus:", error);
+      }
+    }
+    if (id) {
+      loadParentMenus();
+    }
+  }, [id]);
+
+  // 当选择父菜单时，自动继承父菜单的位置
+  useEffect(() => {
+    if (formData.parentId) {
+      async function getParentPosition() {
+        try {
+          const res = await fetch(`/api/admin/navigation/${formData.parentId}`);
+          const data = await res.json();
+          if (data.data && data.data.position) {
+            setFormData((prev) => ({ ...prev, position: data.data.position }));
+          }
+        } catch (error) {
+          console.error("Failed to get parent position:", error);
+        }
+      }
+      getParentPosition();
+    }
+  }, [formData.parentId]);
 
   useEffect(() => {
     params.then((p) => {
@@ -34,13 +75,28 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
       const data = await res.json();
       if (data.data) {
         const item = data.data;
+        
+        // 如果是子菜单，需要获取父菜单的位置
+        let position = item.position || "left";
+        if (item.parentId) {
+          try {
+            const parentRes = await fetch(`/api/admin/navigation/${item.parentId}`);
+            const parentData = await parentRes.json();
+            if (parentData.data) {
+              position = parentData.data.position || "left";
+            }
+          } catch {
+            // 忽略错误，使用默认位置
+          }
+        }
+        
         setFormData({
           label: item.label || "",
           url: item.url || "",
           type: item.type || "link",
           pageType: item.pageType || "",
           pageSlug: item.pageSlug || "",
-          position: item.position || "left",
+          position: position,
           sortOrder: String(item.sortOrder || 0),
           parentId: item.parentId ? String(item.parentId) : "",
           isActive: item.isActive !== false,
@@ -58,9 +114,23 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
     e.preventDefault();
     setSaving(true);
     try {
+      // 如果是子菜单，位置从父菜单继承
+      let position = formData.position;
+      if (formData.parentId) {
+        try {
+          const parentRes = await fetch(`/api/admin/navigation/${formData.parentId}`);
+          const parentData = await parentRes.json();
+          if (parentData.data && parentData.data.position) {
+            position = parentData.data.position;
+          }
+        } catch {
+          // 忽略错误，使用表单中的位置
+        }
+      }
+
       const payload: any = {
         label: formData.label,
-        position: formData.position,
+        position: position,
         sortOrder: parseInt(formData.sortOrder) || 0,
         isActive: formData.isActive,
         openInNewTab: formData.openInNewTab,
@@ -68,13 +138,23 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
 
       if (formData.type === "link") {
         payload.type = "link";
-        payload.url = formData.url;
+        payload.url = formData.url || null;
       } else if (formData.type === "page") {
         payload.type = "page";
         payload.pageType = formData.pageType;
         payload.pageSlug = formData.pageSlug || null;
+        // 如果是自定义路径，使用 url 字段
+        if (formData.pageType === "custom") {
+          payload.url = formData.url || null;
+        } else {
+          payload.url = null;
+        }
       } else if (formData.type === "dropdown") {
         payload.type = "dropdown";
+        // dropdown 类型不需要 URL 或页面设置
+        payload.url = null;
+        payload.pageType = null;
+        payload.pageSlug = null;
       }
 
       if (formData.parentId) {
@@ -128,26 +208,87 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
             onChange={(e) => setFormData({ ...formData, position: e.target.value })}
             className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
             required
+            disabled={!!formData.parentId}
           >
             <option value="left">左侧（最多2个）</option>
             <option value="right">右侧（最多2个）</option>
           </select>
+          {formData.parentId && (
+            <p className="mt-1 text-xs text-gray-500">子菜单的位置继承自父菜单</p>
+          )}
         </div>
 
+        {/* 父菜单选择 - 如果选择父菜单，则这是子菜单 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">父菜单</label>
+          <select
+            value={formData.parentId}
+            onChange={(e) => {
+              const newParentId = e.target.value;
+              setFormData({ 
+                ...formData, 
+                parentId: newParentId,
+                // 如果是子菜单，重置类型为 link
+                type: newParentId ? "link" : formData.type,
+                // 清除 URL 和页面设置
+                url: "",
+                pageType: "",
+                pageSlug: "",
+              });
+            }}
+            className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+          >
+            <option value="">无（一级菜单）</option>
+            {parentMenus.map((menu) => (
+              <option key={menu.id} value={menu.id}>
+                {menu.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-500">
+            {formData.parentId 
+              ? "当前编辑的是子菜单，只能选择外链或内部页面" 
+              : "留空则为一级菜单，可以选择外链、内部页面或下拉菜单"}
+          </p>
+        </div>
+
+        {/* 类型选择 - 根据是否为子菜单显示不同选项 */}
         <div>
           <label className="block text-sm font-medium text-gray-700">类型 *</label>
           <select
             value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            onChange={(e) => {
+              const newType = e.target.value;
+              setFormData({ 
+                ...formData, 
+                type: newType,
+                // 切换类型时清除相关字段
+                url: newType !== "link" ? "" : formData.url,
+                pageType: newType !== "page" ? "" : formData.pageType,
+                pageSlug: newType !== "page" ? "" : formData.pageSlug,
+              });
+            }}
             className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
             required
           >
-            <option value="link">外部链接</option>
-            <option value="page">内部页面</option>
-            <option value="dropdown">下拉菜单</option>
+            {formData.parentId ? (
+              // 子菜单：只能选择外链或内部页面
+              <>
+                <option value="link">外链</option>
+                <option value="page">网站的二级页面</option>
+              </>
+            ) : (
+              // 一级菜单：可以选择外链、内部页面或下拉菜单
+              <>
+                <option value="link">外链</option>
+                <option value="page">网站的二级页面</option>
+                <option value="dropdown">下拉二级菜单</option>
+              </>
+            )}
           </select>
         </div>
 
+        {/* 外链设置 */}
         {formData.type === "link" && (
           <div>
             <label className="block text-sm font-medium text-gray-700">链接地址 *</label>
@@ -162,6 +303,7 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
           </div>
         )}
 
+        {/* 内部页面设置 */}
         {formData.type === "page" && (
           <>
             <div>
@@ -190,6 +332,9 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
                   className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
                   placeholder="留空则跳转到列表页"
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  例如：product-slug（产品slug）或留空跳转到产品列表
+                </p>
               </div>
             )}
             {formData.pageType === "custom" && (
@@ -208,6 +353,15 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
           </>
         )}
 
+        {/* 下拉菜单提示 */}
+        {formData.type === "dropdown" && !formData.parentId && (
+          <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
+            <p className="font-semibold mb-1">下拉菜单说明：</p>
+            <p>选择"下拉二级菜单"后，此菜单项将作为父菜单。创建子菜单时，请在"父菜单"中选择此菜单项。</p>
+            <p className="mt-2">下拉菜单不需要设置链接地址或页面。</p>
+          </div>
+        )}
+
         <div>
           <label className="block text-sm font-medium text-gray-700">排序顺序</label>
           <input
@@ -215,17 +369,6 @@ export default function EditNavigationPage({ params }: { params: Promise<{ id: s
             value={formData.sortOrder}
             onChange={(e) => setFormData({ ...formData, sortOrder: e.target.value })}
             className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">父菜单（用于创建子菜单）</label>
-          <input
-            type="number"
-            value={formData.parentId}
-            onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-            placeholder="留空则为顶级菜单"
           />
         </div>
 

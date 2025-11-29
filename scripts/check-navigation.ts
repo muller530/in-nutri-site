@@ -17,16 +17,16 @@ async function checkNavigation() {
     });
     
     // 查找没有父ID的项（父菜单）
-    const parentItems = items.filter(item => !item.parentId);
+    const parentItems = items.filter((item: any) => !item.parentId);
     console.log(`\n📌 父菜单项 (${parentItems.length} 项):`);
-    parentItems.forEach(item => {
+    parentItems.forEach((item: any) => {
       console.log(`  - ${item.label} (ID: ${item.id})`);
     });
     
     // 查找有父ID的项（子菜单）
-    const childItems = items.filter(item => item.parentId);
+    const childItems = items.filter((item: any) => item.parentId);
     console.log(`\n📌 子菜单项 (${childItems.length} 项):`);
-    childItems.forEach(item => {
+    childItems.forEach((item: any) => {
       console.log(`  - ${item.label} (父ID: ${item.parentId})`);
     });
     

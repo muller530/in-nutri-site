@@ -33,12 +33,19 @@ export async function POST(request: NextRequest) {
     } catch (dbError: any) {
       console.error("数据库查询错误:", dbError);
       
+      // 检查错误消息
+      const errorMessage = dbError?.message || String(dbError);
+      
       // 检查是否是 EdgeOne 环境
       const isEdgeOne = process.env.EDGEONE_DEPLOY === "true" || !!process.env.EDGEONE_URL;
       
-      // 检查错误消息是否包含 EdgeOne 相关提示
-      const errorMessage = dbError?.message || String(dbError);
-      const isEdgeOneError = errorMessage.includes("EdgeOne") || errorMessage.includes("云数据库");
+      // 检查错误消息是否包含 EdgeOne 相关提示或文件系统错误
+      const isEdgeOneError = errorMessage.includes("EdgeOne") || 
+                            errorMessage.includes("云数据库") ||
+                            errorMessage.includes("不支持 SQLite") ||
+                            errorMessage.includes("ENOENT") ||
+                            errorMessage.includes("EACCES") ||
+                            errorMessage.includes("文件系统");
       
       if (isEdgeOne || isEdgeOneError) {
         console.error("⚠️ EdgeOne 环境：数据库连接失败");

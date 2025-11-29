@@ -27,7 +27,26 @@ function isEdgeRuntime(): boolean {
 
 // 检测是否是 EdgeOne 环境
 function isEdgeOneEnvironment(): boolean {
-  return process.env.EDGEONE_DEPLOY === "true" || !!process.env.EDGEONE_URL;
+  // 检查环境变量
+  if (process.env.EDGEONE_DEPLOY === "true" || !!process.env.EDGEONE_URL) {
+    return true;
+  }
+  
+  // 如果环境变量未设置，尝试通过检测文件系统来判断
+  // EdgeOne 环境通常不支持文件系统写入
+  try {
+    // 检查是否在 Edge Runtime 中（EdgeOne 使用 Edge Runtime）
+    if (typeof process === "undefined" || typeof require === "undefined") {
+      // 如果在 Edge Runtime 中且没有 D1 绑定，可能是 EdgeOne
+      if (typeof globalThis !== "undefined" && (globalThis as any).DB === undefined) {
+        return true;
+      }
+    }
+  } catch {
+    // 如果检测失败，假设不是 EdgeOne
+  }
+  
+  return false;
 }
 
 // 延迟初始化数据库连接
@@ -183,8 +202,17 @@ function getDbInstance(): DbType {
     console.log("✅ 使用 SQLite 数据库:", dbPath);
     return dbInstance;
   } catch (error: any) {
-    // 如果是 EdgeOne 环境，提供明确的错误信息
-    if (isEdgeOneEnvironment() || error?.message?.includes("EdgeOne")) {
+    // 检查错误是否是文件系统相关（EdgeOne 不支持文件系统）
+    const errorMessage = error?.message || String(error);
+    const isFileSystemError = errorMessage.includes("ENOENT") || 
+                             errorMessage.includes("EACCES") ||
+                             errorMessage.includes("文件系统") ||
+                             errorMessage.includes("filesystem") ||
+                             errorMessage.includes("SQLite") ||
+                             (error?.code && (error.code === "ENOENT" || error.code === "EACCES"));
+    
+    // 如果是 EdgeOne 环境或文件系统错误，提供明确的错误信息
+    if (isEdgeOneEnvironment() || isFileSystemError || errorMessage.includes("EdgeOne")) {
       console.error("❌ EdgeOne 环境不支持 SQLite 文件系统");
       console.error("💡 解决方案：");
       console.error("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");

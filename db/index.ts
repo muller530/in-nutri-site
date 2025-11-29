@@ -120,6 +120,7 @@ function getDbInstance(): DbType {
     const drizzleModule = require("drizzle-orm/better-sqlite3");
     const Database = require("better-sqlite3");
     
+    const { drizzle } = drizzleModule;
     const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
     
     // 尝试创建 SQLite 连接

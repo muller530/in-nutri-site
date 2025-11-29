@@ -36,11 +36,15 @@ export async function POST(request: NextRequest) {
       // 检查是否是 EdgeOne 环境
       const isEdgeOne = process.env.EDGEONE_DEPLOY === "true" || !!process.env.EDGEONE_URL;
       
-      if (isEdgeOne) {
+      // 检查错误消息是否包含 EdgeOne 相关提示
+      const errorMessage = dbError?.message || String(dbError);
+      const isEdgeOneError = errorMessage.includes("EdgeOne") || errorMessage.includes("云数据库");
+      
+      if (isEdgeOne || isEdgeOneError) {
         console.error("⚠️ EdgeOne 环境：数据库连接失败");
         console.error("💡 解决方案：");
         console.error("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");
-        console.error("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL");
+        console.error("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL（MySQL/PostgreSQL 连接字符串）");
         console.error("   3. 或使用腾讯云轻量应用服务器部署（支持 SQLite）");
         return NextResponse.json({ 
           success: false, 

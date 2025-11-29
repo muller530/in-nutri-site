@@ -49,29 +49,82 @@ function getDbInstance(): DbType {
       const cloudflareModule = requireFunc("./cloudflare");
       const d1Database = (globalThis as any).DB;
       if (d1Database) {
-        console.log("使用 D1 数据库");
+        console.log("✅ 使用 D1 数据库");
         dbInstance = cloudflareModule.createD1Database(d1Database);
         return dbInstance;
       } else {
+        // EdgeOne 环境中，如果没有 D1，应该抛出错误而不是使用占位符
         if (isEdgeOneEnvironment()) {
-          console.warn("⚠️ EdgeOne 环境：D1 数据库绑定未找到");
-          console.warn("💡 解决方案：");
-          console.warn("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");
-          console.warn("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL");
-          console.warn("   3. 或使用腾讯云轻量应用服务器部署（支持 SQLite）");
+          const errorMsg = "EdgeOne 环境不支持 SQLite，请配置云数据库（MySQL/PostgreSQL）或使用腾讯云服务器部署";
+          console.error("❌ EdgeOne 环境：D1 数据库绑定未找到");
+          console.error("💡 解决方案：");
+          console.error("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");
+          console.error("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL（MySQL/PostgreSQL 连接字符串）");
+          console.error("   3. 或使用腾讯云轻量应用服务器部署（支持 SQLite）");
+          // 创建一个会抛出错误的占位符对象
+          dbInstance = {
+            select: () => ({ 
+              from: () => ({ 
+                where: () => Promise.reject(new Error(errorMsg)),
+                limit: () => Promise.reject(new Error(errorMsg)),
+                orderBy: () => Promise.reject(new Error(errorMsg)),
+                all: () => Promise.reject(new Error(errorMsg)),
+              }),
+            }),
+            insert: () => ({ 
+              values: () => ({ 
+                returning: () => Promise.reject(new Error(errorMsg)) 
+              }) 
+            }),
+            update: () => ({ 
+              set: () => ({ 
+                where: () => Promise.reject(new Error(errorMsg)) 
+              }) 
+            }),
+            delete: () => ({ 
+              where: () => Promise.reject(new Error(errorMsg)) 
+            }),
+          };
+          return dbInstance;
         } else {
-          console.warn("D1 数据库绑定未找到，使用占位符");
+          console.warn("⚠️ D1 数据库绑定未找到，使用占位符（仅构建时）");
         }
       }
     } catch (error) {
       console.error("加载 D1 适配器失败:", error);
       if (isEdgeOneEnvironment()) {
-        console.error("⚠️ EdgeOne 环境不支持 SQLite，请配置云数据库");
+        const errorMsg = "EdgeOne 环境不支持 SQLite，请配置云数据库（MySQL/PostgreSQL）或使用腾讯云服务器部署";
+        console.error("❌ EdgeOne 环境不支持 SQLite，请配置云数据库");
+        // 创建一个会抛出错误的占位符对象
+        dbInstance = {
+          select: () => ({ 
+            from: () => ({ 
+              where: () => Promise.reject(new Error(errorMsg)),
+              limit: () => Promise.reject(new Error(errorMsg)),
+              orderBy: () => Promise.reject(new Error(errorMsg)),
+              all: () => Promise.reject(new Error(errorMsg)),
+            }),
+          }),
+          insert: () => ({ 
+            values: () => ({ 
+              returning: () => Promise.reject(new Error(errorMsg)) 
+            }) 
+          }),
+          update: () => ({ 
+            set: () => ({ 
+              where: () => Promise.reject(new Error(errorMsg)) 
+            }) 
+          }),
+          delete: () => ({ 
+            where: () => Promise.reject(new Error(errorMsg)) 
+          }),
+        };
+        return dbInstance;
       }
     }
-    // 在构建时或 D1 不可用时，创建一个占位符对象
+    // 在构建时（非 EdgeOne）或 D1 不可用时，创建一个占位符对象
     // 这允许构建继续进行，但查询会返回空数组
-    // 注意：在 EdgeOne 环境中，这会导致数据库操作失败，需要配置云数据库
+    // 注意：仅在构建时使用，运行时应该使用真实的数据库
     dbInstance = {
       select: () => ({ 
         from: () => ({ 

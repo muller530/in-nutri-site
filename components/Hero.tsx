@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroClient } from "./HeroClient";
 import { VideoBackground } from "./VideoBackground";
+import { Navigation } from "./Navigation";
 
 import { getApiUrl, isBuildTime } from "@/lib/api";
 
@@ -139,6 +140,9 @@ export async function Hero() {
 
   return (
     <header className="relative isolate overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>
+      {/* 导航栏 */}
+      <Navigation transparent={true} />
+      
       {/* 背景层 - 使用纯 CSS，不依赖外部资源 */}
       <div className="absolute inset-0 z-0" style={{
         background: 'linear-gradient(135deg, #0E4F2E 0%, #1a6b3f 50%, #082317 100%)',
@@ -163,18 +167,7 @@ export async function Hero() {
         <div className="particle pointer-events-none absolute left-6 top-10 h-24 w-24 rounded-full border border-white/10" />
       </div>
 
-      <div className="page-shell relative z-30 flex min-h-screen flex-col items-center justify-center gap-10 py-24 text-center">
-        <div className="mt-16">
-          <Image 
-            src="/logo.png" 
-            width={260} 
-            height={80} 
-            alt="In Nutri 标志" 
-            priority 
-            className="drop-shadow-lg"
-            unoptimized={true}
-          />
-        </div>
+      <div className="page-shell relative z-30 flex min-h-screen flex-col items-center justify-center gap-10 py-24 text-center pt-24">
         <div className="space-y-6 max-w-3xl">
           <h1 className="text-4xl font-light leading-tight tracking-wide sm:text-5xl lg:text-6xl">
             {title}

@@ -144,6 +144,23 @@ export const subscribers = sqliteTable("subscribers", {
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
+// 12. Navigation Menu Items (支持多级菜单)
+export const navigationItems = sqliteTable("navigation_items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  label: text("label").notNull(), // 显示文本
+  url: text("url"), // 链接地址（可以是外部链接或内部路径）
+  type: text("type").default("link"), // "link" | "page" | "dropdown"
+  pageType: text("page_type"), // 内部页面类型: "products" | "videos" | "recipes" | "articles" | "custom"
+  pageSlug: text("page_slug"), // 内部页面slug（如果type是page）
+  position: text("position").default("left"), // "left" | "right" | "center"
+  sortOrder: integer("sort_order").default(0), // 排序顺序
+  parentId: integer("parent_id"), // 父菜单ID（用于多级菜单）
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  openInNewTab: integer("open_in_new_tab", { mode: "boolean" }).default(false),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
 // TypeScript types
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
@@ -177,3 +194,6 @@ export type NewContactMessage = typeof contactMessages.$inferInsert;
 
 export type Subscriber = typeof subscribers.$inferSelect;
 export type NewSubscriber = typeof subscribers.$inferInsert;
+
+export type NavigationItem = typeof navigationItems.$inferSelect;
+export type NewNavigationItem = typeof navigationItems.$inferInsert;

@@ -111,7 +111,7 @@ export default async function ProductsPage({
     products.sort((a: ProductType, b: ProductType) => b.name.localeCompare(a.name));
   } else {
     // featured - 推荐产品在前
-    products.sort((a, b) => {
+    products.sort((a: ProductType, b: ProductType) => {
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
       return 0;

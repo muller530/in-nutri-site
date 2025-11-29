@@ -166,19 +166,27 @@ fi
 echo ""
 
 # ============================================
-# 6. 创建/重置管理员账号
+# 6. 验证和修复管理员账号
 # ============================================
-echo -e "${YELLOW}[6/8] 创建管理员账号...${NC}"
+echo -e "${YELLOW}[6/8] 验证和修复管理员账号...${NC}"
 if command -v npm &> /dev/null; then
-    echo -e "${YELLOW}   🔧 重置管理员密码...${NC}"
-    if npm run db:reset-admin 2>&1 | tee /tmp/db-reset.log; then
-        echo -e "${GREEN}   ✅ 管理员账号已创建/重置${NC}"
+    echo -e "${YELLOW}   🔧 验证并修复管理员账号...${NC}"
+    if npm run db:verify-admin 2>&1 | tee /tmp/db-verify.log; then
+        echo -e "${GREEN}   ✅ 管理员账号验证和修复成功${NC}"
         ((FIXES_APPLIED++))
     else
-        echo -e "${RED}   ❌ 管理员账号创建失败${NC}"
+        echo -e "${RED}   ❌ 管理员账号验证失败${NC}"
         echo -e "${YELLOW}   查看错误日志:${NC}"
-        tail -20 /tmp/db-reset.log
-        ((ISSUES_FOUND++))
+        tail -30 /tmp/db-verify.log
+        echo -e "${YELLOW}   🔧 尝试使用备用方法重置...${NC}"
+        if npm run db:reset-admin 2>&1 | tee /tmp/db-reset.log; then
+            echo -e "${GREEN}   ✅ 使用备用方法重置成功${NC}"
+            ((FIXES_APPLIED++))
+        else
+            echo -e "${RED}   ❌ 备用方法也失败${NC}"
+            tail -20 /tmp/db-reset.log
+            ((ISSUES_FOUND++))
+        fi
     fi
 else
     echo -e "${RED}   ❌ npm 未安装，无法创建管理员账号${NC}"

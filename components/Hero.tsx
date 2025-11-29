@@ -15,11 +15,12 @@ async function getBanner() {
     
     const apiUrl = getApiUrl("/api/banners");
     const res = await fetch(apiUrl, {
-      // 使用 revalidate 而不是 no-store，允许静态生成但定期更新
-      next: { revalidate: 60 }, // 60秒重新验证
+      // 使用较短的 revalidate 时间，确保视频更新能及时显示
+      next: { revalidate: 10 }, // 10秒重新验证，更快响应更新
       headers: {
         'Accept': 'application/json',
       },
+      cache: 'no-store', // 开发环境禁用缓存，生产环境使用 revalidate
     });
     if (!res.ok) {
       console.warn("Banner API returned non-OK status:", res.status);
@@ -127,14 +128,14 @@ export async function Hero() {
     videoUrl.endsWith('.webm')
   );
 
-  // 调试信息（仅在服务器端）
-  if (typeof window === "undefined") {
-    console.log("=== Hero 组件调试信息 ===");
-    console.log("Banner 原始 image 值:", banner?.image);
-    console.log("修复后的视频 URL:", videoUrl);
-    console.log("是否为视频:", isVideo);
-    console.log("是否渲染视频组件:", videoUrl && isVideo);
-  }
+  // 调试信息（服务器端和客户端都显示）
+  console.log("=== Hero 组件调试信息 ===");
+  console.log("Banner 原始 image 值:", banner?.image);
+  console.log("修复后的视频 URL:", videoUrl);
+  console.log("是否为视频:", isVideo);
+  console.log("是否渲染视频组件:", videoUrl && isVideo);
+  console.log("Banner key:", banner?.key);
+  console.log("Banner 完整数据:", JSON.stringify(banner, null, 2));
 
   return (
     <header className="relative isolate overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>

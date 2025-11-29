@@ -3,6 +3,10 @@ import { parseAdminFromCookie } from "@/lib/auth";
 import { cookies } from "next/headers";
 import Link from "next/link";
 
+// 强制动态渲染，因为使用了 cookies 和需要数据库访问
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 async function getAdmin() {
   try {
     const cookieStore = await cookies();

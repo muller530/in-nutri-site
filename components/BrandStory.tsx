@@ -4,7 +4,8 @@ import { getApiUrl } from "@/lib/api";
 async function getBrandStory() {
   try {
     const res = await fetch(getApiUrl("/api/brand-story"), {
-      cache: "no-store",
+      // 使用 revalidate 而不是 no-store，允许静态生成但定期更新
+      next: { revalidate: 60 }, // 60秒重新验证
     });
     const data = await res.json();
     return data.data;

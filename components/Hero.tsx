@@ -9,8 +9,8 @@ async function getBanner() {
   try {
     const apiUrl = getApiUrl("/api/banners");
     const res = await fetch(apiUrl, {
-      cache: "no-store",
-      // 在 Edge Runtime 中，确保 fetch 能正常工作
+      // 使用 revalidate 而不是 no-store，允许静态生成但定期更新
+      next: { revalidate: 60 }, // 60秒重新验证
       headers: {
         'Accept': 'application/json',
       },
@@ -40,8 +40,8 @@ async function getBrandStory() {
   try {
     const apiUrl = getApiUrl("/api/brand-story");
     const res = await fetch(apiUrl, {
-      cache: "no-store",
-      // 在 Edge Runtime 中，确保 fetch 能正常工作
+      // 使用 revalidate 而不是 no-store，允许静态生成但定期更新
+      next: { revalidate: 60 }, // 60秒重新验证
       headers: {
         'Accept': 'application/json',
       },

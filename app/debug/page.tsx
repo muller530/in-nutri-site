@@ -1,5 +1,7 @@
 // 诊断页面 - 检查各个组件和 API 是否正常工作
-export const runtime = 'edge';
+// 使用 Node.js runtime，因为需要数据库连接
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export default async function DebugPage() {
   const checks = [];

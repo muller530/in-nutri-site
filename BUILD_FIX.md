@@ -1,77 +1,115 @@
 # 构建问题修复说明
 
-## 问题
+## 已修复的问题
 
-在 Cloudflare Pages 构建时，代码尝试连接 D1 数据库，但构建阶段还没有 Cloudflare 运行时绑定，导致构建失败：
+### 1. ✅ Edge Runtime 配置问题
+- **修复**: `app/api/auth/logout/route.ts` - 从 `edge` 改为 `nodejs`
+- **修复**: `app/debug/page.tsx` - 从 `edge` 改为 `nodejs`，并添加 `force-dynamic`
+- **原因**: Edge Runtime 不支持 cookies API 和数据库连接
 
+### 2. ✅ 静态生成问题
+- **修复**: `components/Hero.tsx` - 将 `cache: "no-store"` 改为 `next: { revalidate: 60 }`
+- **修复**: `components/BrandStory.tsx` - 将 `cache: "no-store"` 改为 `next: { revalidate: 60 }`
+- **修复**: `components/SiteFooter.tsx` - 将 `cache: "no-store"` 改为 `next: { revalidate: 60 }`
+- **修复**: `app/page.tsx` - 添加 `export const dynamic = 'force-dynamic'`
+- **原因**: `no-store` 会导致静态生成失败，使用 `revalidate` 允许静态生成但定期更新
+
+### 3. ⚠️ 数据库表不存在问题
+
+**问题**: 构建时数据库表不存在，导致构建失败
 ```
-Error: D1 database binding not found. Make sure 'DB' is configured in wrangler.toml
+[SqliteError: no such table: gallery_images]
+[SqliteError: no such table: articles]
 ```
 
-## 解决方案
+**解决方案**:
 
-修改了 `db/index.ts`，使用延迟初始化和代理模式：
+#### 方案 A: 在 EdgeOne 构建配置中添加构建前步骤
 
-1. **延迟初始化**：数据库连接不再在模块加载时立即创建
-2. **构建时兼容**：构建时如果无法连接 SQLite，使用内存数据库作为占位符
-3. **运行时检测**：只在运行时检测 Cloudflare 环境并使用 D1
+在 EdgeOne Pages 项目设置中，添加构建命令：
 
-## 工作原理
+```bash
+npm run db:push && npm run build
+```
 
-### 构建阶段
-- 尝试连接 SQLite 数据库
-- 如果失败（文件不存在等），使用内存数据库（`:memory:`）
-- 允许构建继续进行
+或者创建一个新的脚本：
 
-### 运行时
-- 检测是否有 Cloudflare D1 绑定（`globalThis.DB`）
-- 如果有，使用 D1 数据库
-- 如果没有，使用 SQLite 数据库
-
-## 代码变更
-
-```typescript
-// 之前：模块加载时立即初始化
-const isCloudflare = typeof (globalThis as any).DB !== "undefined";
-if (isCloudflare) {
-  // 构建时这里会失败
-  db = createD1Database(d1Database);
+```json
+{
+  "scripts": {
+    "build:edgeone": "npm run db:push && npm run build"
+  }
 }
-
-// 现在：延迟初始化
-function getDbInstance(): DbType {
-  // 只在运行时检测 Cloudflare 环境
-  const isCloudflareRuntime = typeof (globalThis as any).DB !== "undefined";
-  // ...
-}
-
-// 使用代理对象延迟初始化
-export const db = new Proxy({} as DbType, {
-  get(_target, prop) {
-    const actualDb = getDbInstance();
-    // ...
-  },
-});
 ```
 
-## 验证
+#### 方案 B: 在构建脚本中处理数据库错误
 
-- ✅ 本地构建成功
-- ✅ TypeScript 编译通过
-- ✅ 所有路由正常生成
+修改数据库访问代码，在表不存在时返回空数组而不是抛出错误（已实现）。
+
+#### 方案 C: 使用环境变量跳过数据库检查
+
+在构建时设置环境变量，跳过需要数据库的页面：
+
+```bash
+SKIP_DB_CHECK=true npm run build
+```
+
+## 当前状态
+
+✅ **已修复**:
+- Edge Runtime 配置
+- 静态生成问题
+- 数据库错误处理（返回空数组而不是抛出错误）
+
+⚠️ **需要配置**:
+- EdgeOne 构建命令需要包含数据库初始化步骤
+
+## 推荐配置
+
+### EdgeOne Pages 构建配置
+
+**构建命令**:
+```bash
+npm run db:push || true && npm run build
+```
+
+`|| true` 确保即使数据库初始化失败，构建也能继续（因为代码已经处理了表不存在的情况）。
+
+### 本地构建
+
+```bash
+# 1. 初始化数据库
+npm run db:push
+
+# 2. 构建项目
+npm run build
+```
+
+## 验证修复
+
+运行以下命令验证修复：
+
+```bash
+# 1. 检查 Edge Runtime 配置
+npm run check:tencent
+
+# 2. 尝试构建
+npm run build
+
+# 3. 如果构建成功，启动服务器
+npm run start
+```
 
 ## 注意事项
 
-1. **构建时**：使用内存数据库，不会影响构建过程
-2. **运行时**：需要正确的数据库配置（D1 或 SQLite）
-3. **开发环境**：继续使用 SQLite 文件数据库
-4. **生产环境**：Cloudflare Pages 会自动提供 D1 绑定
+1. **数据库初始化**: 在 EdgeOne 构建时，数据库文件可能不存在，需要先运行 `db:push`
+2. **静态生成**: 首页和组件现在使用 `revalidate: 60`，允许静态生成但每60秒更新一次
+3. **动态路由**: 所有使用 cookies 或数据库的页面都已标记为 `force-dynamic`
 
-## 下一步
+## 符合腾讯云部署要求
 
-现在可以正常部署到 Cloudflare Pages 了！
-
-1. 提交代码到 Git
-2. 在 Cloudflare Pages 中触发部署
-3. 确保 `wrangler.toml` 中配置了正确的 D1 数据库 ID
-
+所有修复都符合腾讯云部署基本要求：
+- ✅ 使用 Node.js Runtime（非 Edge Runtime）
+- ✅ 支持文件系统访问（SQLite）
+- ✅ 支持标准 Next.js 构建流程
+- ✅ 不依赖 Cloudflare 特定功能

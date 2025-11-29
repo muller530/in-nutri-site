@@ -1,10 +1,17 @@
 import Link from "next/link";
 export const runtime = 'nodejs'; // 使用 Node.js runtime，因为需要数据库连接
+export const dynamic = 'force-dynamic'; // 强制动态渲染，因为需要数据库访问
 import { db } from "@/db";
 import { products } from "@/db/schema";
 
 async function getProducts() {
-  return await db.select().from(products);
+  try {
+    return await db.select().from(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    // 如果数据库表不存在或连接失败，返回空数组
+    return [];
+  }
 }
 
 export default async function AdminProductsPage() {

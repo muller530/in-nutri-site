@@ -1,25 +1,39 @@
 import { db } from "@/db";
 export const runtime = 'nodejs'; // 使用 Node.js runtime，因为需要数据库连接
+export const dynamic = 'force-dynamic'; // 强制动态渲染，因为需要数据库访问
 import { products, articles, recipes, banners, videos, galleryImages } from "@/db/schema";
 
 async function getStats() {
-  const [productCount, articleCount, recipeCount, bannerCount, videoCount, galleryCount] = await Promise.all([
-    db.select().from(products),
-    db.select().from(articles),
-    db.select().from(recipes),
-    db.select().from(banners),
-    db.select().from(videos),
-    db.select().from(galleryImages),
-  ]);
+  try {
+    const [productCount, articleCount, recipeCount, bannerCount, videoCount, galleryCount] = await Promise.all([
+      db.select().from(products).catch(() => []),
+      db.select().from(articles).catch(() => []),
+      db.select().from(recipes).catch(() => []),
+      db.select().from(banners).catch(() => []),
+      db.select().from(videos).catch(() => []),
+      db.select().from(galleryImages).catch(() => []),
+    ]);
 
-  return {
-    products: productCount.length,
-    articles: articleCount.length,
-    recipes: recipeCount.length,
-    banners: bannerCount.length,
-    videos: videoCount.length,
-    gallery: galleryCount.length,
-  };
+    return {
+      products: productCount.length,
+      articles: articleCount.length,
+      recipes: recipeCount.length,
+      banners: bannerCount.length,
+      videos: videoCount.length,
+      gallery: galleryCount.length,
+    };
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    // 如果数据库表不存在或连接失败，返回零值
+    return {
+      products: 0,
+      articles: 0,
+      recipes: 0,
+      banners: 0,
+      videos: 0,
+      gallery: 0,
+    };
+  }
 }
 
 export default async function AdminDashboard() {

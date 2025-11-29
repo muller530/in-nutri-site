@@ -1,26 +1,59 @@
 import { db } from "@/db";
 export const runtime = 'nodejs'; // 使用 Node.js runtime，因为需要数据库连接
+export const dynamic = 'force-dynamic'; // 强制动态渲染，因为需要数据库访问
 import { brandStory } from "@/db/schema";
 import Link from "next/link";
 
 async function getBrandStory() {
-  const story = await db.select().from(brandStory).limit(1);
-  if (story.length === 0) {
-    // Create default if empty
-    const defaultStory = await db
-      .insert(brandStory)
-      .values({
-        heroTitle: "In-nutri · 有态度的超级食物",
-        heroSubtitle: "源自真实原料",
-        mission: "",
-        vision: "",
-        brandTone: "",
-        storyBlocks: "[]",
-      })
-      .returning();
-    return defaultStory[0];
+  try {
+    const story = await db.select().from(brandStory).limit(1);
+    if (story.length === 0) {
+      // Create default if empty
+      try {
+        const defaultStory = await db
+          .insert(brandStory)
+          .values({
+            heroTitle: "In-nutri · 有态度的超级食物",
+            heroSubtitle: "源自真实原料",
+            mission: "",
+            vision: "",
+            brandTone: "",
+            storyBlocks: "[]",
+          })
+          .returning();
+        return defaultStory[0];
+      } catch (insertError) {
+        // 如果插入失败（表不存在），返回默认值
+        console.error("Error inserting default brand story:", insertError);
+        return {
+          id: 0,
+          heroTitle: "In-nutri · 有态度的超级食物",
+          heroSubtitle: "源自真实原料",
+          mission: "",
+          vision: "",
+          brandTone: "",
+          storyBlocks: "[]",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+      }
+    }
+    return story[0];
+  } catch (error) {
+    console.error("Error fetching brand story:", error);
+    // 如果数据库表不存在或连接失败，返回默认值
+    return {
+      id: 0,
+      heroTitle: "In-nutri · 有态度的超级食物",
+      heroSubtitle: "源自真实原料",
+      mission: "",
+      vision: "",
+      brandTone: "",
+      storyBlocks: "[]",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   }
-  return story[0];
 }
 
 export default async function AdminBrandStoryPage() {

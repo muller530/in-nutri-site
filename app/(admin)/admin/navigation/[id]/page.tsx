@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function EditNavigationPage({ params }: { params: { id: string } }) {
+export default function EditNavigationPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const [id, setId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,12 +22,15 @@ export default function EditNavigationPage({ params }: { params: { id: string } 
   });
 
   useEffect(() => {
-    fetchItem();
-  }, []);
+    params.then((p) => {
+      setId(p.id);
+      fetchItem(p.id);
+    });
+  }, [params]);
 
-  async function fetchItem() {
+  async function fetchItem(itemId: string) {
     try {
-      const res = await fetch(`/api/admin/navigation/${params.id}`);
+      const res = await fetch(`/api/admin/navigation/${itemId}`);
       const data = await res.json();
       if (data.data) {
         const item = data.data;
@@ -79,7 +83,7 @@ export default function EditNavigationPage({ params }: { params: { id: string } 
         payload.parentId = null;
       }
 
-      const res = await fetch(`/api/admin/navigation/${params.id}`, {
+      const res = await fetch(`/api/admin/navigation/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

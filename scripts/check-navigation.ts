@@ -6,7 +6,7 @@ async function checkNavigation() {
     const items = await db.select().from(navigationItems);
     
     console.log(`\n📋 当前导航项 (共 ${items.length} 项):\n`);
-    items.forEach((item) => {
+    items.forEach((item: any) => {
       console.log(`ID: ${item.id}`);
       console.log(`  标签: ${item.label}`);
       console.log(`  位置: ${item.position}`);

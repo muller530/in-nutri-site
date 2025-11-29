@@ -46,7 +46,7 @@ async function getNavigationData() {
         };
       };
 
-      return parentItems.map(buildTree).sort((a, b) => a.sortOrder - b.sortOrder);
+      return parentItems.map(buildTree).sort((a: NavigationItem, b: NavigationItem) => a.sortOrder - b.sortOrder);
     }
   } catch {
     // 忽略错误

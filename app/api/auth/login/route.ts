@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         success: false, 
-        error: "输入格式错误: " + error.errors.map(e => e.message).join(", ") 
+        error: "输入格式错误: " + error.issues.map(e => e.message).join(", ") 
       }, { status: 400 });
     }
     console.error("登录过程发生错误:", error);

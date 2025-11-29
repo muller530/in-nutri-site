@@ -106,9 +106,9 @@ export default async function ProductsPage({
       return parseFloat(priceB) - parseFloat(priceA);
     });
   } else if (sort === "name-asc") {
-    products.sort((a, b) => a.name.localeCompare(b.name));
+    products.sort((a: ProductType, b: ProductType) => a.name.localeCompare(b.name));
   } else if (sort === "name-desc") {
-    products.sort((a, b) => b.name.localeCompare(a.name));
+    products.sort((a: ProductType, b: ProductType) => b.name.localeCompare(a.name));
   } else {
     // featured - 推荐产品在前
     products.sort((a, b) => {

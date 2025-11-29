@@ -17,6 +17,10 @@ const updateSiteSettingsSchema = z.object({
   tmallUrl: z.string().url().optional().or(z.literal("")),
   jdUrl: z.string().url().optional().or(z.literal("")),
   qualityReportUrl: z.string().optional(),
+  promotionalBannerText: z.string().optional(),
+  promotionalBannerUrl: z.string().url().optional().or(z.literal("")),
+  promotionalBannerActive: z.boolean().optional(),
+  logoTagline: z.string().optional(),
 });
 
 // GET: 获取站点设置（管理员）
@@ -34,6 +38,10 @@ export async function GET(request: NextRequest) {
           tmallUrl: null,
           jdUrl: null,
           qualityReportUrl: null,
+          promotionalBannerText: null,
+          promotionalBannerUrl: null,
+          promotionalBannerActive: false,
+          logoTagline: null,
         })
         .returning();
       return NextResponse.json({ data: defaultSettings[0], error: null });
@@ -67,6 +75,10 @@ export async function PUT(request: NextRequest) {
           xiaohongshuUrl: validated.xiaohongshuUrl || null,
           tmallUrl: validated.tmallUrl || null,
           jdUrl: validated.jdUrl || null,
+          promotionalBannerText: validated.promotionalBannerText || null,
+          promotionalBannerUrl: validated.promotionalBannerUrl || null,
+          promotionalBannerActive: validated.promotionalBannerActive || false,
+          logoTagline: validated.logoTagline || null,
         })
         .returning();
     } else {
@@ -80,6 +92,10 @@ export async function PUT(request: NextRequest) {
           tmallUrl: validated.tmallUrl || null,
           jdUrl: validated.jdUrl || null,
           qualityReportUrl: validated.qualityReportUrl || null,
+          promotionalBannerText: validated.promotionalBannerText || null,
+          promotionalBannerUrl: validated.promotionalBannerUrl || null,
+          promotionalBannerActive: validated.promotionalBannerActive || false,
+          logoTagline: validated.logoTagline || null,
           updatedAt: new Date(),
         })
         .where(eq(siteSettings.id, existing[0].id))

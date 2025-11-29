@@ -15,6 +15,10 @@ export default function SiteSettingsPage() {
     tmallUrl: "",
     jdUrl: "",
     qualityReportUrl: "",
+    promotionalBannerText: "",
+    promotionalBannerUrl: "",
+    promotionalBannerActive: false,
+    logoTagline: "",
   });
 
   useEffect(() => {
@@ -29,6 +33,10 @@ export default function SiteSettingsPage() {
             tmallUrl: data.data.tmallUrl || "",
             jdUrl: data.data.jdUrl || "",
             qualityReportUrl: data.data.qualityReportUrl || "",
+            promotionalBannerText: data.data.promotionalBannerText || "",
+            promotionalBannerUrl: data.data.promotionalBannerUrl || "",
+            promotionalBannerActive: data.data.promotionalBannerActive || false,
+            logoTagline: data.data.logoTagline || "",
           });
         }
       } catch {
@@ -156,6 +164,62 @@ export default function SiteSettingsPage() {
               placeholder="https://mall.jd.com/..."
             />
           </div>
+        </div>
+
+        <div className="space-y-4 border-t pt-6">
+          <h2 className="text-xl font-semibold text-gray-800">导航栏设置</h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Logo 标语</label>
+            <input
+              type="text"
+              value={formData.logoTagline}
+              onChange={(e) => setFormData({ ...formData, logoTagline: e.target.value })}
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+              placeholder="例如: NATURE-POWERED"
+            />
+            <p className="mt-1 text-xs text-gray-500">显示在 Logo 上方的标语文字</p>
+          </div>
+        </div>
+
+        <div className="space-y-4 border-t pt-6">
+          <h2 className="text-xl font-semibold text-gray-800">顶部促销横幅</h2>
+          <div>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={formData.promotionalBannerActive}
+                onChange={(e) => setFormData({ ...formData, promotionalBannerActive: e.target.checked })}
+                className="mr-2"
+              />
+              <span className="text-sm font-medium text-gray-700">启用促销横幅</span>
+            </label>
+          </div>
+          {formData.promotionalBannerActive && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">横幅文字 *</label>
+                <input
+                  type="text"
+                  value={formData.promotionalBannerText}
+                  onChange={(e) => setFormData({ ...formData, promotionalBannerText: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+                  placeholder="例如: 30% OFF EVERYTHING // NO CODES NEEDED"
+                  required={formData.promotionalBannerActive}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">横幅链接（可选）</label>
+                <input
+                  type="url"
+                  value={formData.promotionalBannerUrl}
+                  onChange={(e) => setFormData({ ...formData, promotionalBannerUrl: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+                  placeholder="https://example.com/promo"
+                />
+                <p className="mt-1 text-xs text-gray-500">留空则横幅不可点击</p>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="space-y-4 border-t pt-6">

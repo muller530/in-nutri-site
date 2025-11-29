@@ -124,6 +124,10 @@ export const siteSettings = sqliteTable("site_settings", {
   tmallUrl: text("tmall_url"), // 天猫链接
   jdUrl: text("jd_url"), // 京东链接
   qualityReportUrl: text("quality_report_url"), // 质检报告文件 URL
+  promotionalBannerText: text("promotional_banner_text"), // 顶部促销横幅文字
+  promotionalBannerUrl: text("promotional_banner_url"), // 促销横幅链接
+  promotionalBannerActive: integer("promotional_banner_active", { mode: "boolean" }).default(false), // 是否激活促销横幅
+  logoTagline: text("logo_tagline"), // Logo上方的标语（如 "NATURE-POWERED"）
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });

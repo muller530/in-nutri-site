@@ -3,7 +3,6 @@ import Link from "next/link";
 import { HeroClient } from "./HeroClient";
 import { VideoBackground } from "./VideoBackground";
 import { Navigation } from "./Navigation";
-
 import { getApiUrl, isBuildTime } from "@/lib/api";
 
 async function getBanner() {
@@ -141,7 +140,7 @@ export async function Hero() {
   return (
     <header className="relative isolate overflow-hidden text-white min-h-screen" style={{ backgroundColor: '#082317' }}>
       {/* 导航栏 */}
-      <Navigation transparent={true} />
+      <Navigation />
       
       {/* 背景层 - 使用纯 CSS，不依赖外部资源 */}
       <div className="absolute inset-0 z-0" style={{
@@ -167,7 +166,7 @@ export async function Hero() {
         <div className="particle pointer-events-none absolute left-6 top-10 h-24 w-24 rounded-full border border-white/10" />
       </div>
 
-      <div className="page-shell relative z-30 flex min-h-screen flex-col items-center justify-center gap-10 py-24 text-center pt-24">
+      <div className="page-shell relative z-30 flex min-h-screen flex-col items-center justify-center gap-10 py-24 text-center" style={{ paddingTop: '120px' }}>
         <div className="space-y-6 max-w-3xl">
           <h1 className="text-4xl font-light leading-tight tracking-wide sm:text-5xl lg:text-6xl">
             {title}

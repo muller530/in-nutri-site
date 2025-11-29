@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getApiUrl } from "@/lib/api";
+import { Search, User, ShoppingCart } from "lucide-react";
 
 interface NavigationItem {
   id: number;
@@ -20,81 +21,87 @@ interface NavigationItem {
   children?: NavigationItem[];
 }
 
-interface NavigationProps {
-  transparent?: boolean;
+interface SiteSettings {
+  promotionalBannerText?: string | null;
+  promotionalBannerUrl?: string | null;
+  promotionalBannerActive?: boolean;
+  logoTagline?: string | null;
 }
 
-export function Navigation({ transparent = true }: NavigationProps) {
+export function Navigation() {
   const [navItems, setNavItems] = useState<NavigationItem[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // 监听滚动
   useEffect(() => {
-    async function fetchNavigation() {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 获取导航数据和站点设置
+  useEffect(() => {
+    async function fetchData() {
       try {
-        const apiUrl = getApiUrl("/api/navigation");
-        console.log("Navigation: 获取导航数据，URL:", apiUrl);
-        
-        const res = await fetch(apiUrl, {
+        // 获取导航项
+        const navRes = await fetch(getApiUrl("/api/navigation"), {
           cache: "no-store",
         });
-        
-        console.log("Navigation: API 响应状态:", res.status);
-        
-        if (!res.ok) {
-          console.error("Navigation: API 返回错误状态:", res.status);
-          setLoading(false);
-          return;
-        }
-        
-        const data = await res.json();
-        console.log("Navigation: 接收到的数据:", data);
-        
-        if (data.data && Array.isArray(data.data)) {
-          // 构建层级结构
-          const items = data.data as NavigationItem[];
-          console.log("Navigation: 原始导航项数量:", items.length);
-          
-          const parentItems = items.filter((item) => !item.parentId);
-          console.log("Navigation: 顶级导航项数量:", parentItems.length);
-          
-          const childrenMap = new Map<number, NavigationItem[]>();
-          
-          items.forEach((item) => {
-            if (item.parentId) {
-              if (!childrenMap.has(item.parentId)) {
-                childrenMap.set(item.parentId, []);
+        if (navRes.ok) {
+          const navData = await navRes.json();
+          if (navData.data && Array.isArray(navData.data)) {
+            const items = navData.data as NavigationItem[];
+            const parentItems = items.filter((item) => !item.parentId);
+            const childrenMap = new Map<number, NavigationItem[]>();
+            
+            items.forEach((item) => {
+              if (item.parentId) {
+                if (!childrenMap.has(item.parentId)) {
+                  childrenMap.set(item.parentId, []);
+                }
+                childrenMap.get(item.parentId)!.push(item);
               }
-              childrenMap.get(item.parentId)!.push(item);
-            }
-          });
+            });
 
-          const buildTree = (item: NavigationItem): NavigationItem => {
-            const children = childrenMap.get(item.id) || [];
-            return {
-              ...item,
-              children: children.length > 0 ? children.map(buildTree) : undefined,
+            const buildTree = (item: NavigationItem): NavigationItem => {
+              const children = childrenMap.get(item.id) || [];
+              return {
+                ...item,
+                children: children.length > 0 ? children.map(buildTree) : undefined,
+              };
             };
-          };
 
-          const sortedItems = parentItems.map(buildTree).sort((a, b) => a.sortOrder - b.sortOrder);
-          console.log("Navigation: 处理后的导航项:", sortedItems);
-          setNavItems(sortedItems);
-        } else {
-          console.warn("Navigation: 数据格式不正确或为空");
+            setNavItems(parentItems.map(buildTree).sort((a, b) => a.sortOrder - b.sortOrder));
+          }
+        }
+
+        // 获取站点设置
+        const settingsRes = await fetch(getApiUrl("/api/site-settings"), {
+          cache: "no-store",
+        });
+        if (settingsRes.ok) {
+          const settingsData = await settingsRes.json();
+          if (settingsData.data) {
+            setSiteSettings(settingsData.data);
+          }
         }
       } catch (error) {
-        console.error("Navigation: 获取导航数据失败:", error);
+        console.error("Failed to fetch navigation data:", error);
       } finally {
         setLoading(false);
       }
     }
-    fetchNavigation();
+    fetchData();
   }, []);
 
   const getHref = (item: NavigationItem): string => {
     if (item.type === "page" && item.pageType) {
-      // 内部页面链接
       switch (item.pageType) {
         case "products":
           return item.pageSlug ? `/products/${item.pageSlug}` : "/#products";
@@ -116,19 +123,10 @@ export function Navigation({ transparent = true }: NavigationProps) {
   const leftItems = navItems.filter((item) => item.position === "left");
   const rightItems = navItems.filter((item) => item.position === "right");
 
-  // 调试信息
-  useEffect(() => {
-    console.log("Navigation: 当前导航项状态:", {
-      total: navItems.length,
-      left: leftItems.length,
-      right: rightItems.length,
-      items: navItems,
-    });
-  }, [navItems, leftItems, rightItems]);
-
   const renderMenuItem = (item: NavigationItem) => {
     const hasChildren = item.children && item.children.length > 0;
     const href = getHref(item);
+    const textColor = isScrolled ? "text-gray-900" : "text-white";
 
     if (hasChildren) {
       return (
@@ -139,11 +137,7 @@ export function Navigation({ transparent = true }: NavigationProps) {
           onMouseLeave={() => setHoveredItem(null)}
         >
           <button
-            className={`px-4 py-2 text-sm font-medium transition-colors ${
-              transparent
-                ? "text-white hover:text-white/80"
-                : "text-gray-900 hover:text-gray-600"
-            }`}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${textColor} hover:opacity-80`}
           >
             {item.label}
             <span className="ml-1">▼</span>
@@ -171,65 +165,116 @@ export function Navigation({ transparent = true }: NavigationProps) {
         key={item.id}
         href={href}
         target={item.openInNewTab ? "_blank" : "_self"}
-        className={`px-4 py-2 text-sm font-medium transition-colors ${
-          transparent
-            ? "text-white hover:text-white/80"
-            : "text-gray-900 hover:text-gray-600"
-        }`}
+        className={`px-4 py-2 text-sm font-medium transition-colors ${textColor} hover:opacity-80`}
       >
         {item.label}
       </Link>
     );
   };
 
-  // 即使没有导航项，也显示导航栏（至少显示 Logo）
+  const showPromoBanner = siteSettings?.promotionalBannerActive && siteSettings?.promotionalBannerText;
+
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all ${
-        transparent
-          ? "bg-transparent backdrop-blur-sm"
-          : "bg-white/95 backdrop-blur-sm shadow-sm"
-      }`}
-    >
-      <div className="page-shell">
-        <div className="flex items-center justify-between h-16">
-          {/* 左侧导航 */}
-          <div className="flex items-center gap-2 min-w-[120px]">
-            {loading ? (
-              <span className={`text-xs ${transparent ? "text-white/60" : "text-gray-400"}`}>
-                加载中...
-              </span>
-            ) : (
-              leftItems.slice(0, 2).map((item) => renderMenuItem(item))
-            )}
-          </div>
+    <>
+      {/* 顶部促销横幅 */}
+      {showPromoBanner && (
+        <div className="fixed top-0 left-0 right-0 z-[60] bg-gray-900 text-white text-center py-2 text-xs font-medium">
+          {siteSettings.promotionalBannerUrl ? (
+            <Link href={siteSettings.promotionalBannerUrl} className="hover:opacity-80">
+              {siteSettings.promotionalBannerText}
+            </Link>
+          ) : (
+            <span>{siteSettings.promotionalBannerText}</span>
+          )}
+        </div>
+      )}
 
-          {/* Logo 居中 */}
-          <Link href="/" className="flex-shrink-0">
-            <Image
-              src="/logo.png"
-              width={120}
-              height={40}
-              alt="In Nutri 标志"
-              className="h-10 w-auto"
-              priority
-              unoptimized={true}
-            />
-          </Link>
+      {/* 主导航栏 */}
+      <nav
+        className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
+          showPromoBanner ? "top-8" : "top-0"
+        } ${
+          isScrolled
+            ? "bg-white shadow-sm"
+            : "bg-transparent backdrop-blur-sm"
+        }`}
+        style={{
+          borderRadius: isScrolled ? "0" : "0 0 12px 12px",
+        }}
+      >
+        <div className="page-shell">
+          <div className="flex items-center justify-between h-16">
+            {/* 左侧导航 */}
+            <div className="flex items-center gap-4 min-w-[200px]">
+              {loading ? (
+                <span className={`text-xs ${isScrolled ? "text-gray-400" : "text-white/60"}`}>
+                  加载中...
+                </span>
+              ) : (
+                leftItems.slice(0, 2).map((item) => renderMenuItem(item))
+              )}
+            </div>
 
-          {/* 右侧导航 */}
-          <div className="flex items-center gap-2 min-w-[120px] justify-end">
-            {loading ? (
-              <span className={`text-xs ${transparent ? "text-white/60" : "text-gray-400"}`}>
-                加载中...
-              </span>
-            ) : (
-              rightItems.slice(0, 2).map((item) => renderMenuItem(item))
-            )}
+            {/* Logo 居中 */}
+            <Link href="/" className="flex-shrink-0 flex flex-col items-center">
+              {siteSettings?.logoTagline && (
+                <span
+                  className={`text-xs font-medium mb-1 transition-colors ${
+                    isScrolled ? "text-gray-600" : "text-white"
+                  }`}
+                  style={{ letterSpacing: "0.05em" }}
+                >
+                  {siteSettings.logoTagline}
+                </span>
+              )}
+              <Image
+                src="/logo.png"
+                width={120}
+                height={40}
+                alt="In Nutri 标志"
+                className="h-8 w-auto"
+                priority
+                unoptimized={true}
+              />
+            </Link>
+
+            {/* 右侧导航和图标 */}
+            <div className="flex items-center gap-4 min-w-[200px] justify-end">
+              {loading ? (
+                <span className={`text-xs ${isScrolled ? "text-gray-400" : "text-white/60"}`}>
+                  加载中...
+                </span>
+              ) : (
+                <>
+                  {rightItems.slice(0, 2).map((item) => renderMenuItem(item))}
+                  
+                  {/* 右侧图标 */}
+                  <div className="flex items-center gap-3 ml-2 pl-2 border-l border-gray-300">
+                    <button
+                      className={`p-2 transition-colors ${isScrolled ? "text-gray-900" : "text-white"} hover:opacity-80`}
+                      aria-label="搜索"
+                    >
+                      <Search size={18} />
+                    </button>
+                    <button
+                      className={`p-2 transition-colors ${isScrolled ? "text-gray-900" : "text-white"} hover:opacity-80`}
+                      aria-label="会员"
+                    >
+                      <User size={18} />
+                    </button>
+                    <button
+                      className={`p-2 transition-colors ${isScrolled ? "text-gray-900" : "text-white"} hover:opacity-80`}
+                      aria-label="购物车"
+                    >
+                      <ShoppingCart size={18} />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }
-

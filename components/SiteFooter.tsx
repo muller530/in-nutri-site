@@ -1,10 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getApiUrl } from "@/lib/api";
+import { getApiUrl, isBuildTime } from "@/lib/api";
 import { SocialIcons } from "./SocialIcons";
 
 async function getSiteSettings() {
   try {
+    // 构建时跳过 fetch，返回 null（使用默认值）
+    if (isBuildTime() && !process.env.NEXT_PUBLIC_BASE_URL) {
+      return null;
+    }
+    
     const res = await fetch(getApiUrl("/api/site-settings"), {
       // 使用 revalidate 而不是 no-store，允许静态生成但定期更新
       next: { revalidate: 60 }, // 60秒重新验证

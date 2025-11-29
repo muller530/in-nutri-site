@@ -1,8 +1,13 @@
 import { SectionHeading } from "@/components/SectionHeading";
-import { getApiUrl } from "@/lib/api";
+import { getApiUrl, isBuildTime } from "@/lib/api";
 
 async function getBrandStory() {
   try {
+    // 构建时跳过 fetch，返回 null（使用默认值）
+    if (isBuildTime() && !process.env.NEXT_PUBLIC_BASE_URL) {
+      return null;
+    }
+    
     const res = await fetch(getApiUrl("/api/brand-story"), {
       // 使用 revalidate 而不是 no-store，允许静态生成但定期更新
       next: { revalidate: 60 }, // 60秒重新验证

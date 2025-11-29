@@ -3,10 +3,15 @@ import Link from "next/link";
 import { HeroClient } from "./HeroClient";
 import { VideoBackground } from "./VideoBackground";
 
-import { getApiUrl } from "@/lib/api";
+import { getApiUrl, isBuildTime } from "@/lib/api";
 
 async function getBanner() {
   try {
+    // 构建时跳过 fetch，返回 null（使用默认值）
+    if (isBuildTime() && !process.env.NEXT_PUBLIC_BASE_URL) {
+      return null;
+    }
+    
     const apiUrl = getApiUrl("/api/banners");
     const res = await fetch(apiUrl, {
       // 使用 revalidate 而不是 no-store，允许静态生成但定期更新
@@ -38,6 +43,11 @@ async function getBanner() {
 
 async function getBrandStory() {
   try {
+    // 构建时跳过 fetch，返回 null（使用默认值）
+    if (isBuildTime() && !process.env.NEXT_PUBLIC_BASE_URL) {
+      return null;
+    }
+    
     const apiUrl = getApiUrl("/api/brand-story");
     const res = await fetch(apiUrl, {
       // 使用 revalidate 而不是 no-store，允许静态生成但定期更新

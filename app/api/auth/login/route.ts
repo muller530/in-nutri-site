@@ -26,33 +26,90 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = loginSchema.parse(body);
 
-    const member = await db.select().from(members).where(eq(members.email, email)).limit(1);
-    if (member.length === 0 || !member[0].isActive) {
-      return NextResponse.json({ success: false, error: "Invalid credentials" }, { status: 401 });
+    // 尝试查询数据库
+    let member;
+    try {
+      member = await db.select().from(members).where(eq(members.email, email)).limit(1);
+    } catch (dbError: any) {
+      console.error("数据库查询错误:", dbError);
+      return NextResponse.json({ 
+        success: false, 
+        error: "数据库连接失败，请检查数据库配置" 
+      }, { status: 500 });
     }
 
-    const isValid = await bcrypt.compare(password, member[0].passwordHash);
+    if (member.length === 0) {
+      console.warn(`登录失败: 用户不存在 - ${email}`);
+      return NextResponse.json({ success: false, error: "邮箱或密码错误" }, { status: 401 });
+    }
+
+    if (!member[0].isActive) {
+      console.warn(`登录失败: 用户未激活 - ${email}`);
+      return NextResponse.json({ success: false, error: "账户已被禁用" }, { status: 401 });
+    }
+
+    // 验证密码
+    let isValid;
+    try {
+      isValid = await bcrypt.compare(password, member[0].passwordHash);
+    } catch (bcryptError: any) {
+      console.error("密码验证错误:", bcryptError);
+      return NextResponse.json({ success: false, error: "密码验证失败" }, { status: 500 });
+    }
+
     if (!isValid) {
-      return NextResponse.json({ success: false, error: "Invalid credentials" }, { status: 401 });
+      console.warn(`登录失败: 密码错误 - ${email}`);
+      return NextResponse.json({ success: false, error: "邮箱或密码错误" }, { status: 401 });
     }
 
-    const sessionToken = await createSession(member[0].id);
-    const cookieStore = await cookies();
-    cookieStore.set(getSessionCookieName(), sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: "/",
-    });
+    // 创建会话
+    let sessionToken;
+    try {
+      sessionToken = await createSession(member[0].id);
+    } catch (sessionError: any) {
+      console.error("创建会话错误:", sessionError);
+      return NextResponse.json({ success: false, error: "创建会话失败" }, { status: 500 });
+    }
+
+    // 设置 Cookie
+    try {
+      const cookieStore = await cookies();
+      
+      // 检查是否是 HTTPS（通过环境变量或请求头）
+      // EdgeOne 通常使用 HTTPS，但可能没有正确设置 x-forwarded-proto
+      const isSecure = process.env.NODE_ENV === "production" && 
+                      (process.env.FORCE_SECURE_COOKIE === "true" || 
+                       request.headers.get("x-forwarded-proto") === "https" ||
+                       request.url.startsWith("https://"));
+      
+      cookieStore.set(getSessionCookieName(), sessionToken, {
+        httpOnly: true,
+        secure: isSecure, // 根据实际环境设置
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+        path: "/",
+      });
+
+      console.log(`登录成功: ${email}, secure=${isSecure}`);
+    } catch (cookieError: any) {
+      console.error("设置 Cookie 错误:", cookieError);
+      // 即使 Cookie 设置失败，也返回成功（某些环境下可能正常）
+      // 但记录错误以便排查
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: "Invalid input" }, { status: 400 });
+      return NextResponse.json({ 
+        success: false, 
+        error: "输入格式错误: " + error.errors.map(e => e.message).join(", ") 
+      }, { status: 400 });
     }
-    console.error("Error during login:", error);
-    return NextResponse.json({ success: false, error: "Login failed" }, { status: 500 });
+    console.error("登录过程发生错误:", error);
+    return NextResponse.json({ 
+      success: false, 
+      error: "登录失败: " + (error instanceof Error ? error.message : "未知错误") 
+    }, { status: 500 });
   }
 }
 

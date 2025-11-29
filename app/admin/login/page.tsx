@@ -25,13 +25,23 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (data.success) {
+        // 登录成功，跳转到管理后台
         router.push("/admin");
         router.refresh();
       } else {
-        setError(data.error || "登录失败");
+        // 显示具体错误信息
+        const errorMessage = data.error || `登录失败 (HTTP ${res.status})`;
+        setError(errorMessage);
+        console.error("登录失败:", {
+          status: res.status,
+          error: data.error,
+          response: data
+        });
       }
-    } catch {
-      setError("发生错误");
+    } catch (err: any) {
+      const errorMessage = err?.message || "网络错误，请检查网络连接";
+      setError(errorMessage);
+      console.error("登录请求异常:", err);
     } finally {
       setLoading(false);
     }

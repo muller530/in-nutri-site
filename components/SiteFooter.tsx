@@ -6,7 +6,8 @@ import { SocialIcons } from "./SocialIcons";
 async function getSiteSettings() {
   try {
     // 构建时跳过 fetch，返回 null（使用默认值）
-    if (isBuildTime() && !process.env.NEXT_PUBLIC_BASE_URL) {
+    // 只在真正的构建阶段跳过，运行时应该尝试 fetch
+    if (isBuildTime()) {
       return null;
     }
     

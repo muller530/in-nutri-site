@@ -1,14 +1,19 @@
 /**
  * 检查是否是构建时
+ * 只在真正的构建阶段返回 true，运行时应该返回 false
  */
 export function isBuildTime(): boolean {
-  return (
-    process.env.NEXT_PHASE === "phase-production-build" ||
-    process.env.NEXT_PHASE === "phase-production-compile" ||
-    process.env.NEXT_PHASE === "phase-export" ||
-    // 如果没有配置 NEXT_PUBLIC_BASE_URL，可能是构建时
-    (!process.env.NEXT_PUBLIC_BASE_URL && process.env.NODE_ENV === "production")
-  );
+  // 检查 NEXT_PHASE 环境变量（Next.js 构建时设置）
+  const nextPhase = process.env.NEXT_PHASE;
+  if (nextPhase === "phase-production-build" || 
+      nextPhase === "phase-production-compile" ||
+      nextPhase === "phase-export") {
+    return true;
+  }
+  
+  // 如果不在构建阶段，返回 false（即使没有配置 NEXT_PUBLIC_BASE_URL）
+  // 运行时应该尝试 fetch，即使可能失败
+  return false;
 }
 
 export function getApiUrl(path: string): string {
@@ -20,11 +25,10 @@ export function getApiUrl(path: string): string {
       return `${baseUrl}${path}`;
     }
     
-    // 构建时：返回 null 标记（调用者应该检查）
-    // 注意：这个函数不应该在构建时被调用，应该在调用前检查 isBuildTime()
+    // 构建时：不应该调用此函数，应该在调用前检查 isBuildTime()
+    // 如果确实在构建时调用，返回相对路径（虽然可能无法使用，但不会报错）
     if (isBuildTime()) {
-      // 构建时如果没有配置 base URL，抛出错误提示应该跳过 fetch
-      throw new Error("Cannot fetch during build time without NEXT_PUBLIC_BASE_URL");
+      return path;
     }
     
     // 运行时：优先使用环境变量配置的 base URL

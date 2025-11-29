@@ -152,7 +152,7 @@ export default async function ProductsPage({
             {/* 产品网格 - 参考KOS.com的布局，4列网格 */}
             {products.length > 0 ? (
               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {products.map((product) => (
+                {products.map((product: ProductType) => (
                   <ProductListCard key={product.id} product={product} />
                 ))}
               </div>

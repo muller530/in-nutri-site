@@ -92,14 +92,15 @@ export default async function ProductsPage({
   let products = allProducts.map(transformProduct);
   
   // 排序
+  type ProductType = ReturnType<typeof transformProduct>;
   if (sort === "price-low") {
-    products.sort((a, b) => {
+    products.sort((a: ProductType, b: ProductType) => {
       const priceA = a.price.match(/¥(\d+\.?\d*)/)?.[1] || "0";
       const priceB = b.price.match(/¥(\d+\.?\d*)/)?.[1] || "0";
       return parseFloat(priceA) - parseFloat(priceB);
     });
   } else if (sort === "price-high") {
-    products.sort((a, b) => {
+    products.sort((a: ProductType, b: ProductType) => {
       const priceA = a.price.match(/¥(\d+\.?\d*)/)?.[1] || "0";
       const priceB = b.price.match(/¥(\d+\.?\d*)/)?.[1] || "0";
       return parseFloat(priceB) - parseFloat(priceA);

@@ -5,20 +5,29 @@ type DbType = any;
 
 let dbInstance: DbType | null = null;
 
-// 检测是否在 Edge Runtime 中（构建时或 Cloudflare 运行时）
+// 检测是否在 Edge Runtime 或 EdgeOne 环境中
 function isEdgeRuntime(): boolean {
   // 检查是否有 D1 绑定（Cloudflare 环境）
-  // 在 Cloudflare Pages 运行时，globalThis.DB 会被注入
   if (typeof globalThis !== "undefined" && (globalThis as any).DB !== undefined && (globalThis as any).DB !== null) {
     return true;
   }
+  
+  // 检查是否是 EdgeOne 环境（优先检测）
+  if (process.env.EDGEONE_DEPLOY === "true" || process.env.EDGEONE_URL) {
+    // EdgeOne 不支持文件系统，需要使用云数据库
+    return true;
+  }
+  
   // 检查是否在构建时（Next.js build）
-  // 在构建时，假设是 Edge Runtime（避免导入 better-sqlite3）
-  // 但如果设置了 DATABASE_URL，说明是本地开发环境，应该使用 SQLite
   const isBuildTime = typeof process === "undefined" || 
          (process.env.NEXT_PHASE === "phase-production-build" && !process.env.DATABASE_URL) ||
          (process.env.NODE_ENV === "production" && !process.env.CF_PAGES_BRANCH && !process.env.DATABASE_URL);
   return isBuildTime;
+}
+
+// 检测是否是 EdgeOne 环境
+function isEdgeOneEnvironment(): boolean {
+  return process.env.EDGEONE_DEPLOY === "true" || !!process.env.EDGEONE_URL;
 }
 
 // 延迟初始化数据库连接
@@ -44,19 +53,32 @@ function getDbInstance(): DbType {
         dbInstance = cloudflareModule.createD1Database(d1Database);
         return dbInstance;
       } else {
-        console.warn("D1 数据库绑定未找到，使用占位符");
+        if (isEdgeOneEnvironment()) {
+          console.warn("⚠️ EdgeOne 环境：D1 数据库绑定未找到");
+          console.warn("💡 解决方案：");
+          console.warn("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");
+          console.warn("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL");
+          console.warn("   3. 或使用腾讯云轻量应用服务器部署（支持 SQLite）");
+        } else {
+          console.warn("D1 数据库绑定未找到，使用占位符");
+        }
       }
     } catch (error) {
       console.error("加载 D1 适配器失败:", error);
+      if (isEdgeOneEnvironment()) {
+        console.error("⚠️ EdgeOne 环境不支持 SQLite，请配置云数据库");
+      }
     }
     // 在构建时或 D1 不可用时，创建一个占位符对象
     // 这允许构建继续进行，但查询会返回空数组
+    // 注意：在 EdgeOne 环境中，这会导致数据库操作失败，需要配置云数据库
     dbInstance = {
       select: () => ({ 
         from: () => ({ 
           where: () => Promise.resolve([]),
           limit: () => Promise.resolve([]),
           orderBy: () => Promise.resolve([]),
+          all: () => Promise.resolve([]),
         }),
       }),
       insert: () => ({ 
@@ -76,10 +98,20 @@ function getDbInstance(): DbType {
     return dbInstance;
   }
 
-  // 本地开发环境：使用 SQLite
+  // 本地开发环境或腾讯云部署：使用 SQLite
   // 只有在非 Edge Runtime 时才执行这段代码
   // 在 Node.js runtime 中，require 是可用的
   try {
+    // 再次检查是否是 EdgeOne 环境（双重保险）
+    if (isEdgeOneEnvironment()) {
+      console.error("❌ EdgeOne 环境不支持 SQLite 文件系统");
+      console.error("💡 解决方案：");
+      console.error("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");
+      console.error("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL（MySQL/PostgreSQL 连接字符串）");
+      console.error("   3. 或使用腾讯云轻量应用服务器部署（支持 SQLite）");
+      throw new Error("EdgeOne 不支持 SQLite，请配置云数据库或使用腾讯云服务器部署");
+    }
+    
     // 在 Node.js runtime 中，直接使用 require
     if (typeof require === "undefined") {
       throw new Error("require is not available in this environment");
@@ -88,28 +120,46 @@ function getDbInstance(): DbType {
     const drizzleModule = require("drizzle-orm/better-sqlite3");
     const Database = require("better-sqlite3");
     
-    const { drizzle } = drizzleModule;
     const dbPath = process.env.DATABASE_URL || "./db/sqlite.db";
+    
+    // 尝试创建 SQLite 连接
     const sqlite = new Database(dbPath);
     sqlite.pragma("journal_mode = WAL");
     dbInstance = drizzle(sqlite, { schema });
-    console.log("使用 SQLite 数据库:", dbPath);
+    console.log("✅ 使用 SQLite 数据库:", dbPath);
     return dbInstance;
-  } catch (error) {
-    // 如果无法创建 SQLite 连接，使用内存数据库
-    console.warn("使用内存数据库:", error);
-    try {
-      const drizzleModule = require("drizzle-orm/better-sqlite3");
-      const Database = require("better-sqlite3");
-      
-      const { drizzle } = drizzleModule;
-      const sqlite = new Database(":memory:");
-      sqlite.pragma("journal_mode = WAL");
-      dbInstance = drizzle(sqlite, { schema });
-      return dbInstance;
-    } catch (innerError) {
-      console.error("创建内存数据库失败:", innerError);
-      throw innerError;
+  } catch (error: any) {
+    // 如果是 EdgeOne 环境，提供明确的错误信息
+    if (isEdgeOneEnvironment() || error?.message?.includes("EdgeOne")) {
+      console.error("❌ EdgeOne 环境不支持 SQLite 文件系统");
+      console.error("💡 解决方案：");
+      console.error("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");
+      console.error("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL（MySQL/PostgreSQL 连接字符串）");
+      console.error("   3. 或使用腾讯云轻量应用服务器部署（支持 SQLite）");
+      throw new Error("EdgeOne 不支持 SQLite，请配置云数据库或使用腾讯云服务器部署");
+    }
+    
+    // 如果无法创建 SQLite 连接，尝试使用内存数据库（仅开发环境）
+    if (process.env.NODE_ENV === "development") {
+      console.warn("⚠️ SQLite 文件连接失败，尝试使用内存数据库:", error?.message);
+      try {
+        const drizzleModule = require("drizzle-orm/better-sqlite3");
+        const Database = require("better-sqlite3");
+        
+        const { drizzle } = drizzleModule;
+        const sqlite = new Database(":memory:");
+        sqlite.pragma("journal_mode = WAL");
+        dbInstance = drizzle(sqlite, { schema });
+        console.log("⚠️ 使用内存数据库（数据不会持久化）");
+        return dbInstance;
+      } catch (innerError) {
+        console.error("创建内存数据库失败:", innerError);
+        throw innerError;
+      }
+    } else {
+      // 生产环境，直接抛出错误
+      console.error("❌ 数据库连接失败:", error?.message || error);
+      throw error;
     }
   }
 }

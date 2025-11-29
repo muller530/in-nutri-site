@@ -32,6 +32,22 @@ export async function POST(request: NextRequest) {
       member = await db.select().from(members).where(eq(members.email, email)).limit(1);
     } catch (dbError: any) {
       console.error("数据库查询错误:", dbError);
+      
+      // 检查是否是 EdgeOne 环境
+      const isEdgeOne = process.env.EDGEONE_DEPLOY === "true" || !!process.env.EDGEONE_URL;
+      
+      if (isEdgeOne) {
+        console.error("⚠️ EdgeOne 环境：数据库连接失败");
+        console.error("💡 解决方案：");
+        console.error("   1. 使用腾讯云 MySQL/PostgreSQL 数据库");
+        console.error("   2. 在 EdgeOne 环境变量中设置 DATABASE_URL");
+        console.error("   3. 或使用腾讯云轻量应用服务器部署（支持 SQLite）");
+        return NextResponse.json({ 
+          success: false, 
+          error: "数据库连接失败：EdgeOne 环境不支持 SQLite，请配置云数据库（MySQL/PostgreSQL）或使用腾讯云服务器部署" 
+        }, { status: 500 });
+      }
+      
       return NextResponse.json({ 
         success: false, 
         error: "数据库连接失败，请检查数据库配置" 

@@ -8,8 +8,8 @@ import { ScienceHighlights } from "@/components/ScienceHighlights";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SiteFooter } from "@/components/SiteFooter";
 
-// 移除 force-dynamic，让组件内部的 revalidate 控制缓存
-// 这样既支持静态生成（生产环境），又支持实时更新（开发环境）
+// 使用动态渲染，避免构建时超时
+export const dynamic = 'force-dynamic';
 
 const services = [
   {

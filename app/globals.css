@@ -103,6 +103,10 @@ body {
   animation: scroll-dot 1.4s ease-in-out infinite;
 }
 
+.partner-brands-scroll-custom:hover {
+  animation-play-state: paused;
+}
+
 @keyframes scroll-dot {
   0% {
     transform: translateY(0);

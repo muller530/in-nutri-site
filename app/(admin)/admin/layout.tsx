@@ -37,6 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/videos", label: "视频" },
     { href: "/admin/navigation", label: "导航菜单" },
     { href: "/admin/social-platforms", label: "社交媒体" },
+    { href: "/admin/partner-brands", label: "合作品牌" },
     { href: "/admin/gallery", label: "图库" },
     { href: "/admin/members", label: "成员" },
     { href: "/admin/site-settings", label: "站点设置" },

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getApiUrl } from "@/lib/api";
 import { Search, User, ShoppingCart } from "lucide-react";
+import { ensureUrlProtocol } from "@/lib/urlUtils";
 
 interface NavigationItem {
   id: number;
@@ -184,10 +185,18 @@ export function Navigation({
         case "articles":
           return item.pageSlug ? `/articles/${item.pageSlug}` : "/#articles";
         case "custom":
+          // 自定义路径可能是相对路径或外部链接
+          if (item.url && !item.url.startsWith("/")) {
+            return ensureUrlProtocol(item.url);
+          }
           return item.url || "#";
         default:
           return item.url || "#";
       }
+    }
+    // 外部链接：确保有协议前缀
+    if (item.type === "link" && item.url) {
+      return ensureUrlProtocol(item.url);
     }
     return item.url || "#";
   };
@@ -330,10 +339,14 @@ export function Navigation({
 
   return (
     <>
-      {/* 顶部促销横幅 - 深灰色背景，最高层级 */}
+      {/* 顶部促销横幅 - 初始透明毛玻璃效果，滚动后变黑色 */}
       {showPromoBanner && (
         <div 
-          className="fixed top-0 left-0 right-0 bg-gray-800 text-white text-center py-2.5 text-xs font-medium uppercase tracking-wide"
+          className={`fixed top-0 left-0 right-0 text-white text-center py-2.5 text-xs font-medium uppercase tracking-wide transition-all duration-300 ${
+            isScrolled || !isHomePage
+              ? "bg-black"
+              : "bg-black/20 backdrop-blur-md shadow-lg"
+          }`}
           style={{ 
             zIndex: 10000, 
             position: "fixed",
@@ -358,7 +371,7 @@ export function Navigation({
           showPromoBanner ? "top-8" : "top-0"
         } ${
           isScrolled || !isHomePage
-            ? "bg-white shadow-sm"
+            ? "bg-white shadow-lg"
             : "bg-transparent"
         }`}
         style={{
@@ -425,7 +438,9 @@ export function Navigation({
               )}
               
               {/* 右侧图标 */}
-              <div className="flex items-center gap-3 pl-4 border-l border-gray-300">
+              <div className={`flex items-center gap-3 pl-4 border-l transition-colors ${
+                isScrolled || !isHomePage ? "border-gray-300" : "border-white/30"
+              }`}>
                 <button
                   className={`p-2 transition-colors ${isScrolled || !isHomePage ? "text-gray-900" : "text-white"} hover:opacity-80`}
                   aria-label="搜索"

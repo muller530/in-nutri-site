@@ -163,7 +163,7 @@ export async function Hero() {
         <div className="particle pointer-events-none absolute left-6 top-10 h-24 w-24 rounded-full border border-white/10" />
       </div>
 
-      <div className="page-shell relative z-0 flex min-h-screen flex-col items-center justify-end gap-10 py-24 text-center" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+      <div className="page-shell relative z-0 flex min-h-screen flex-col items-center justify-center gap-10 py-24 text-center">
         <div className="space-y-6 max-w-3xl">
           <h1 className="text-4xl font-light leading-tight tracking-wide sm:text-5xl lg:text-6xl">
             {title}
@@ -188,7 +188,7 @@ export async function Hero() {
           </Link>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-3 text-xs text-white/70">
+        <div className="absolute bottom-10 flex flex-col items-center gap-3 text-xs text-white/70">
           <div className="scroll-mouse">
             <div className="scroll-mouse-dot" />
           </div>

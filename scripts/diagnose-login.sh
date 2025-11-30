@@ -234,3 +234,6 @@ echo -e "   邮箱: ${GREEN}admin@in-nutri.com${NC}"
 echo -e "   密码: ${GREEN}inNutriAdmin123${NC}"
 echo ""
 
+
+
+

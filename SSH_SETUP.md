@@ -115,3 +115,6 @@ bash scripts/deploy-direct.sh
 2. 确认公钥已正确添加到服务器
 3. 检查服务器上的 `~/.ssh/authorized_keys` 文件权限
 
+
+
+

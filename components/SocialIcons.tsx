@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getApiUrl } from "@/lib/api";
+import { ensureUrlProtocol } from "@/lib/urlUtils";
 
 interface SocialPlatform {
   id: number;
@@ -94,13 +95,18 @@ export function SocialIcons() {
       <span className="text-sm font-medium text-white/80">Follow:</span>
       <div className="flex items-center gap-3">
         {platforms.map((platform) => {
-          if (!platform.url) {
+          // 过滤掉无效的 URL（空字符串、null、undefined）
+          if (!platform.url || platform.url.trim() === "") {
             return null;
           }
+          
+          // 确保 URL 有协议前缀
+          const url = ensureUrlProtocol(platform.url);
+          
           return (
             <a
               key={platform.id}
-              href={platform.url}
+              href={url}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center w-8 h-8 text-white/80 hover:text-white transition-colors"

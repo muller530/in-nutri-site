@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ensureUrlProtocol } from "@/lib/urlUtils";
 
 interface SocialPlatform {
   id: number;
@@ -60,11 +61,16 @@ export default function SocialPlatformsPage() {
 
     try {
       if (editingId) {
-        // 更新
+        // 更新 - 自动为 URL 添加协议前缀
+        const updateData = {
+          ...formData,
+          iconImage: formData.iconType === "image" && formData.iconImage ? ensureUrlProtocol(formData.iconImage) : formData.iconImage,
+          url: formData.url ? ensureUrlProtocol(formData.url) : formData.url,
+        };
         const res = await fetch(`/api/admin/social-platforms/${editingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(updateData),
         });
         const data = await res.json();
         if (data.error) {
@@ -96,9 +102,9 @@ export default function SocialPlatformsPage() {
           name: formData.name?.trim() || "",
           iconType: formData.iconType || "svg",
           iconSvg: formData.iconType === "svg" ? (formData.iconSvg || "") : "",
-          iconImage: formData.iconType === "image" ? (formData.iconImage || "") : "",
+          iconImage: formData.iconType === "image" ? (formData.iconImage ? ensureUrlProtocol(formData.iconImage) : "") : "",
           iconEmoji: formData.iconType === "emoji" ? (formData.iconEmoji || "") : "",
-          url: formData.url || "",
+          url: formData.url ? ensureUrlProtocol(formData.url) : "",
           sortOrder: formData.sortOrder ?? 0,
           isActive: formData.isActive ?? true,
         };
@@ -279,7 +285,7 @@ export default function SocialPlatformsPage() {
                   value={formData.iconImage || ""}
                   onChange={(e) => setFormData({ ...formData, iconImage: e.target.value })}
                   className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                  placeholder="https://example.com/icon.png"
+                  placeholder="example.com/icon.png 或 https://example.com/icon.png"
                 />
               </div>
             )}
@@ -304,7 +310,7 @@ export default function SocialPlatformsPage() {
                 value={formData.url || ""}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                 className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                placeholder="https://www.facebook.com/yourpage"
+                placeholder="www.facebook.com/yourpage 或 https://www.facebook.com/yourpage"
               />
             </div>
 

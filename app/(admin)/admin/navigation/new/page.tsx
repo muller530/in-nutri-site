@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ensureUrlProtocol } from "@/lib/urlUtils";
 
 export default function NewNavigationPage() {
   const router = useRouter();
@@ -90,12 +91,13 @@ export default function NewNavigationPage() {
 
       if (formData.type === "link") {
         payload.type = "link";
-        payload.url = formData.url || null;
+        // 外链：自动添加协议前缀
+        payload.url = formData.url ? ensureUrlProtocol(formData.url) : null;
       } else if (formData.type === "page") {
         payload.type = "page";
         payload.pageType = formData.pageType;
         payload.pageSlug = formData.pageSlug || null;
-        // 如果是自定义路径，使用 url 字段
+        // 如果是自定义路径，使用 url 字段（相对路径，不添加协议）
         if (formData.pageType === "custom") {
           payload.url = formData.url || null;
         } else {
@@ -242,22 +244,7 @@ export default function NewNavigationPage() {
               value={formData.url}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
               className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              placeholder="https://example.com"
-              required
-            />
-          </div>
-        )}
-
-        {/* 外链设置 */}
-        {formData.type === "link" && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">链接地址 *</label>
-            <input
-              type="url"
-              value={formData.url}
-              onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              placeholder="https://example.com"
+              placeholder="example.com 或 https://example.com"
               required
             />
           </div>

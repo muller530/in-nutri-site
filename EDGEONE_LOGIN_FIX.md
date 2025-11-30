@@ -128,3 +128,6 @@ DATABASE_URL=./db/sqlite.db
 3. **检查环境变量**：确认 SESSION_SECRET 已设置
 4. **查看日志**：检查 EdgeOne 的错误日志
 
+
+
+

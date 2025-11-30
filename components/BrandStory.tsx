@@ -78,8 +78,8 @@ export async function BrandStory() {
     : defaultPillars;
 
   return (
-    <section id="philosophy" className="relative z-0 bg-white">
-      <div className="page-shell grid gap-12 py-24 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+    <section id="philosophy" className="relative z-0 bg-white -mt-0">
+      <div className="page-shell grid gap-12 py-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div className="space-y-8">
           <SectionHeading
             eyebrow="BRAND ATTITUDE"

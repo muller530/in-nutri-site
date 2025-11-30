@@ -126,3 +126,6 @@ A: 先使用密码登录，部署完成后可以再配置密钥
 
 连接成功后，按照 `QUICK_DEPLOY.md` 或 `LIGHTHOUSE_DEPLOY.md` 中的步骤进行部署。
 
+
+
+

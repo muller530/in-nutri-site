@@ -3,6 +3,7 @@ export const runtime = 'nodejs'; // 使用 Node.js runtime，因为需要数据�
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ensureUrlProtocol } from "@/lib/urlUtils";
 
 export default function SiteSettingsPage() {
   const router = useRouter();
@@ -94,10 +95,20 @@ export default function SiteSettingsPage() {
     e.preventDefault();
     setSaving(true);
     try {
+      // 自动为所有 URL 添加协议前缀
+      const processedData = {
+        ...formData,
+        douyinUrl: formData.douyinUrl ? ensureUrlProtocol(formData.douyinUrl) : formData.douyinUrl,
+        xiaohongshuUrl: formData.xiaohongshuUrl ? ensureUrlProtocol(formData.xiaohongshuUrl) : formData.xiaohongshuUrl,
+        tmallUrl: formData.tmallUrl ? ensureUrlProtocol(formData.tmallUrl) : formData.tmallUrl,
+        jdUrl: formData.jdUrl ? ensureUrlProtocol(formData.jdUrl) : formData.jdUrl,
+        promotionalBannerUrl: formData.promotionalBannerUrl ? ensureUrlProtocol(formData.promotionalBannerUrl) : formData.promotionalBannerUrl,
+        qualityReportUrl: formData.qualityReportUrl ? ensureUrlProtocol(formData.qualityReportUrl) : formData.qualityReportUrl,
+      };
       const res = await fetch("/api/admin/site-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(processedData),
       });
 
       const data = await res.json();
@@ -131,7 +142,7 @@ export default function SiteSettingsPage() {
               value={formData.douyinUrl}
               onChange={(e) => setFormData({ ...formData, douyinUrl: e.target.value })}
               className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              placeholder="https://www.douyin.com/user/..."
+              placeholder="www.douyin.com/user/... 或 https://www.douyin.com/user/..."
             />
           </div>
           <div>
@@ -141,7 +152,7 @@ export default function SiteSettingsPage() {
               value={formData.xiaohongshuUrl}
               onChange={(e) => setFormData({ ...formData, xiaohongshuUrl: e.target.value })}
               className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              placeholder="https://www.xiaohongshu.com/user/..."
+              placeholder="www.xiaohongshu.com/user/... 或 https://www.xiaohongshu.com/user/..."
             />
           </div>
           <div>
@@ -151,7 +162,7 @@ export default function SiteSettingsPage() {
               value={formData.tmallUrl}
               onChange={(e) => setFormData({ ...formData, tmallUrl: e.target.value })}
               className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              placeholder="https://xxx.tmall.com/..."
+              placeholder="xxx.tmall.com/... 或 https://xxx.tmall.com/..."
             />
           </div>
           <div>
@@ -161,7 +172,7 @@ export default function SiteSettingsPage() {
               value={formData.jdUrl}
               onChange={(e) => setFormData({ ...formData, jdUrl: e.target.value })}
               className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              placeholder="https://mall.jd.com/..."
+              placeholder="mall.jd.com/... 或 https://mall.jd.com/..."
             />
           </div>
         </div>
@@ -214,7 +225,7 @@ export default function SiteSettingsPage() {
                   value={formData.promotionalBannerUrl}
                   onChange={(e) => setFormData({ ...formData, promotionalBannerUrl: e.target.value })}
                   className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                  placeholder="https://example.com/promo"
+                  placeholder="example.com/promo 或 https://example.com/promo"
                 />
                 <p className="mt-1 text-xs text-gray-500">留空则横幅不可点击</p>
               </div>
@@ -263,7 +274,7 @@ export default function SiteSettingsPage() {
                   value={formData.qualityReportUrl}
                   onChange={(e) => setFormData({ ...formData, qualityReportUrl: e.target.value })}
                   className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
-                  placeholder="https://example.com/report.pdf"
+                  placeholder="example.com/report.pdf 或 https://example.com/report.pdf"
                 />
               </div>
             </div>

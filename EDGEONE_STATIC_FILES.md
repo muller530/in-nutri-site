@@ -56,3 +56,6 @@ const imageUrl = product.image || "/default-product.png";
 1. 在 EdgeOne 项目设置中，添加静态文件目录配置
 2. 或者将上传的文件手动上传到 EdgeOne 的静态资源目录
 
+
+
+

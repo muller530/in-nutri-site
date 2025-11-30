@@ -172,3 +172,6 @@ echo "   2. 如果权限有问题，运行: chmod 664 db/sqlite.db"
 echo "   3. 如果仍有问题，考虑使用 MySQL/PostgreSQL 数据库"
 echo "   4. 查看详细日志: pm2 logs in-nutri-site"
 
+
+
+

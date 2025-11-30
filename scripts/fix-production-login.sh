@@ -110,3 +110,6 @@ echo -e "   1. 请使用上述账号登录后台"
 echo -e "   2. 登录后建议立即修改密码"
 echo -e "   3. 如果仍有问题，请查看应用日志：${GREEN}pm2 logs in-nutri-site${NC}"
 
+
+
+

@@ -180,6 +180,83 @@ export const socialPlatforms = sqliteTable("social_platforms", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
+// 14. Partner Brands (合作品牌)
+export const partnerBrands = sqliteTable("partner_brands", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(), // 品牌名称
+  logoUrl: text("logo_url").notNull(), // Logo图片URL
+  websiteUrl: text("website_url"), // 品牌官网链接（可选）
+  sortOrder: integer("sort_order").default(0), // 排序顺序
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+// 15. About Us (关于我们 - 单行表，存储主要信息)
+export const aboutUs = sqliteTable("about_us", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  heroTitle: text("hero_title"), // Hero 标题
+  heroSubtitle: text("hero_subtitle"), // Hero 副标题
+  heroVideoUrl: text("hero_video_url"), // Hero 视频URL
+  missionTitle: text("mission_title"), // 使命标题
+  missionContent: text("mission_content"), // 使命内容
+  motto: text("motto"), // 口号
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+// 16. Core Values (核心价值)
+export const coreValues = sqliteTable("core_values", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  number: text("number"), // 编号，如 "01"
+  title: text("title").notNull(), // 标题
+  hashtag: text("hashtag"), // 标签，如 "#SCRAPPY"
+  sortOrder: integer("sort_order").default(0), // 排序顺序
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+// 17. Milestones (里程碑)
+export const milestones = sqliteTable("milestones", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  year: text("year"), // 年份
+  month: text("month"), // 月份或季度（例如: "MARCH", "Q1'25", "Q4'24"）
+  title: text("title").notNull(), // 标题
+  description: text("description"), // 描述（可选）
+  color: text("color").default("#10B981"), // 年份颜色（十六进制）
+  icon: text("icon"), // 图标类型（可选: "rocket", "unicorn", "globe", "star", null）
+  sortOrder: integer("sort_order").default(0), // 排序顺序
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+// 18. About Gallery (关于我们图片画廊)
+export const aboutGallery = sqliteTable("about_gallery", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  imageUrl: text("image_url").notNull(), // 图片URL
+  alt: text("alt"), // 图片alt文本
+  sortOrder: integer("sort_order").default(0), // 排序顺序
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+// 19. Map Locations (地图位置标记)
+export const mapLocations = sqliteTable("map_locations", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(), // 位置名称，如 "SAN DIEGO HQ"
+  label: text("label"), // 标签，如 "HQ"（可选）
+  latitude: text("latitude").notNull(), // 纬度（字符串格式，如 "32.7157"）
+  longitude: text("longitude").notNull(), // 经度（字符串格式，如 "-117.1611"）
+  color: text("color").default("#7C3AED"), // 标记颜色（十六进制）
+  sortOrder: integer("sort_order").default(0), // 排序顺序
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
 // TypeScript types
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
@@ -219,3 +296,21 @@ export type NewNavigationItem = typeof navigationItems.$inferInsert;
 
 export type SocialPlatform = typeof socialPlatforms.$inferSelect;
 export type NewSocialPlatform = typeof socialPlatforms.$inferInsert;
+
+export type PartnerBrand = typeof partnerBrands.$inferSelect;
+export type NewPartnerBrand = typeof partnerBrands.$inferInsert;
+
+export type AboutUs = typeof aboutUs.$inferSelect;
+export type NewAboutUs = typeof aboutUs.$inferInsert;
+
+export type CoreValue = typeof coreValues.$inferSelect;
+export type NewCoreValue = typeof coreValues.$inferInsert;
+
+export type Milestone = typeof milestones.$inferSelect;
+export type NewMilestone = typeof milestones.$inferInsert;
+
+export type AboutGallery = typeof aboutGallery.$inferSelect;
+export type NewAboutGallery = typeof aboutGallery.$inferInsert;
+
+export type MapLocation = typeof mapLocations.$inferSelect;
+export type NewMapLocation = typeof mapLocations.$inferInsert;

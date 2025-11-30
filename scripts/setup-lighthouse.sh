@@ -323,3 +323,6 @@ echo ""
 echo "📚 详细文档请查看: LIGHTHOUSE_DEPLOY.md"
 echo ""
 
+
+
+

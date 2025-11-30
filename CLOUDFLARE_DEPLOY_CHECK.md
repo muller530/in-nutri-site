@@ -166,3 +166,6 @@ npx wrangler d1 execute in-nutri-db --file=./drizzle/0000_*.sql --remote
 
 
 
+
+
+

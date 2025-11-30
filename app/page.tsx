@@ -3,6 +3,7 @@ import { CreatorsSpotlight } from "@/components/CreatorsSpotlight";
 import { Hero } from "@/components/Hero";
 import { LifestyleGrid } from "@/components/LifestyleGrid";
 import { NavigationServer } from "@/components/NavigationServer";
+import { PartnerBrands } from "@/components/PartnerBrands";
 import { ProductShowcase } from "@/components/ProductShowcase";
 import { ScienceHighlights } from "@/components/ScienceHighlights";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -32,10 +33,11 @@ export default async function Home() {
       {/* 导航栏 - 移到页面级别，确保在最上层 */}
       <NavigationServer />
       <Hero />
+      <PartnerBrands />
       <BrandStory />
 
       <section className="relative z-0 bg-white">
-        <div className="page-shell py-24">
+        <div className="page-shell py-16">
           <SectionHeading
             eyebrow="SIGNATURE SERVICE"
             title="不仅是产品，更是可执行的超级食物日程"

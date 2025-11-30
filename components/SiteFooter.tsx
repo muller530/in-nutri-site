@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getApiUrl, isBuildTime } from "@/lib/api";
 import { SocialIcons } from "./SocialIcons";
+import { ensureUrlProtocol } from "@/lib/urlUtils";
 
 async function getSiteSettings() {
   try {
@@ -63,14 +64,14 @@ export async function SiteFooter() {
             <SocialIcons />
             {/* 质检报告 */}
             {settings?.qualityReportUrl && (
-              <Link
-                href={settings.qualityReportUrl}
+              <a
+                href={ensureUrlProtocol(settings.qualityReportUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-full border border-white/20 px-4 py-2 text-center text-xs uppercase tracking-[0.3em] text-white/50 transition hover:border-white/40 hover:bg-white/10 hover:text-white/70"
               >
                 好产品检测报告
-              </Link>
+              </a>
             )}
           </div>
         </div>
